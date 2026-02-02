@@ -1,0 +1,27 @@
+/* quiz.css */
+.quiz-question {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+
+.quiz-answers {
+  display: flex;
+  justify-content: center; 
+  gap: 1rem;               
+  margin-top: 1.5rem;
+  flex-wrap: wrap;         
+}
+
+
+.quiz-answers button {
+  background-color: #020617;
+  border: 1px solid #1e293b;
+  margin: 0 auto;
+}
+
+.quiz-answers button:hover {
+  background-color: #020617;
+  border-color: #3b82f6;
+}

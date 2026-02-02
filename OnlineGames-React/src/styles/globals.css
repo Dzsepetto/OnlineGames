@@ -1,0 +1,32 @@
+/* globals.css */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  background-color: #0f172a; /* dark blue */
+  color: #e5e7eb;
+}
+
+h1, h2, h3 {
+  margin-bottom: 0.5rem;
+
+}
+h1, h2{
+  text-align: center;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+main {
+  min-height: calc(100vh - 120px);
+  padding: 2rem;
+}
