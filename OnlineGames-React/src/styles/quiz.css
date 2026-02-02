@@ -1,27 +1,155 @@
-/* quiz.css */
-.quiz-question {
-  max-width: 600px;
+/* ===== Base quiz layout ===== */
+
+.quiz-play {
+  max-width: 900px;
   margin: 0 auto;
-  text-align: center;
+  padding: 18px 16px;
 }
 
+.quiz-play-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.quiz-progress {
+  font-weight: 700;
+}
+
+.quiz-score {
+  opacity: 0.85;
+  font-weight: 600;
+}
+
+.quiz-question {
+  padding: 14px 12px;
+}
+
+.quiz-question h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+/* ===== Multiple choice answers ===== */
 
 .quiz-answers {
   display: flex;
-  justify-content: center; 
-  gap: 1rem;               
-  margin-top: 1.5rem;
-  flex-wrap: wrap;         
+  flex-direction: column;
+  gap: 10px;
 }
 
-
 .quiz-answers button {
-  background-color: #020617;
-  border: 1px solid #1e293b;
-  margin: 0 auto;
+  padding: 10px 12px;
+  border: 1px solid #020617;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #020617;
+  text-align: left;
+  font-weight: 600;
 }
 
 .quiz-answers button:hover {
-  background-color: #020617;
-  border-color: #3b82f6;
+  filter: brightness(0.98);
+}
+
+.quiz-answers button:active {
+  transform: translateY(1px);
+}
+
+.quiz-answers button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== Matching (table-like) ===== */
+
+.matching-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.matching-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.matching-head {
+  font-weight: 800;
+  padding: 6px 4px;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+/* dropzone */
+.matching-dropzone {
+  min-height: 140px;
+  padding: 10px;
+  border: 2px dashed #bbb;
+  border-radius: 12px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: filter 0.1s ease, background 0.1s ease;
+}
+
+.matching-dropzone.is-dragging {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* cards */
+.matching-card {
+  padding: 9px 10px;
+  border: 1px solid #020617;
+  border-radius: 10px;
+  background: #020617;
+  cursor: grab;
+  user-select: none;
+  font-weight: 600;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.matching-card:active {
+  cursor: grabbing;
+  transform: translateY(1px);
+}
+
+/* bank */
+.matching-bank-wrap {
+  margin-top: 18px;
+}
+
+.matching-bank-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.matching-bank {
+  border: 1px solid #e1e1e1;
+  border-radius: 12px;
+  padding: 10px;
+  min-height: 70px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: rgba(0, 0, 0, 0.01);
+}
+
+/* submit */
+.matching-submit {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #020617;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.matching-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
