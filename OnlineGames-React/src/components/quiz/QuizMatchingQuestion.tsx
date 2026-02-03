@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { QuizQuestion } from "../../types/quiz";
-import "../../styles/quiz.css"
+import "../../styles/quiz.css";
 
 type Card = {
   id: string;
@@ -26,12 +26,14 @@ const QuizMatchingQuestion = ({
 }) => {
   const groups = question.groups ?? [];
 
-  const columns = useMemo(() => {
-    return groups.map((g) => ({
-      id: g.id,
-      header: g.left.length > 0 ? g.left[0] : "—",
-    }));
-  }, [question.id]);
+  const columns = useMemo(
+    () =>
+      groups.map((g) => ({
+        id: g.id,
+        header: g.left[0] ?? "—",
+      })),
+    [question.id]
+  );
 
   const initialBank = useMemo<Card[]>(() => {
     const cards: Card[] = [];
@@ -50,76 +52,99 @@ const QuizMatchingQuestion = ({
   const [bank, setBank] = useState<Card[]>(initialBank);
   const [placed, setPlaced] = useState<Record<string, Card[]>>({});
   const [dragId, setDragId] = useState<string | null>(null);
+  const [activeDrop, setActiveDrop] = useState<string | null>(null);
 
-  if (groups.length === 0 || columns.length === 0) {
-    return (
-      <div className="quiz-question">
-        <h3>{question.question}</h3>
-        <div>No matching groups found.</div>
-      </div>
-    );
-  }
+  const dragEl = useRef<HTMLDivElement | null>(null);
 
   const findCard = (id: string): Card | null => {
-    const inBank = bank.find((c) => c.id === id);
-    if (inBank) return inBank;
-
-    for (const gid of Object.keys(placed)) {
-      const c = (placed[gid] ?? []).find((x) => x.id === id);
+    const b = bank.find((c) => c.id === id);
+    if (b) return b;
+    for (const gid in placed) {
+      const c = placed[gid]?.find((x) => x.id === id);
       if (c) return c;
     }
     return null;
   };
 
-  const removeCardEverywhere = (id: string) => {
+  const removeEverywhere = (id: string) => {
     setBank((b) => b.filter((c) => c.id !== id));
     setPlaced((p) => {
       const next: Record<string, Card[]> = {};
-      for (const gid of Object.keys(p)) {
-        next[gid] = (p[gid] ?? []).filter((c) => c.id !== id);
+      for (const gid in p) {
+        next[gid] = p[gid].filter((c) => c.id !== id);
       }
       return next;
     });
   };
 
-  const dropToGroup = (groupId: string) => {
+  const placeToGroup = (gid: string) => {
     if (!dragId) return;
     const card = findCard(dragId);
     if (!card) return;
 
-    removeCardEverywhere(dragId);
+    removeEverywhere(dragId);
     setPlaced((p) => ({
       ...p,
-      [groupId]: [...(p[groupId] ?? []), card],
+      [gid]: [...(p[gid] ?? []), card],
     }));
-    setDragId(null);
   };
 
-  const dropToBank = () => {
+  const placeToBank = () => {
     if (!dragId) return;
     const card = findCard(dragId);
     if (!card) return;
 
-    removeCardEverywhere(dragId);
+    removeEverywhere(dragId);
     setBank((b) => [...b, card]);
-    setDragId(null);
   };
 
-  const totalCards = initialBank.length;
-  const placedCount = Object.values(placed).reduce(
-    (acc, arr) => acc + (arr?.length ?? 0),
-    0
-  );
-  const allPlaced = placedCount === totalCards;
+  /* ---------------- pointer handlers ---------------- */
+
+  const onPointerDown = (
+    e: React.PointerEvent<HTMLDivElement>,
+    id: string
+  ) => {
+    e.preventDefault();
+    setDragId(id);
+    dragEl.current = e.currentTarget;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    e.currentTarget.classList.add("is-dragging");
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragId) return;
+
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const drop = el?.closest("[data-drop]");
+    const dropId = drop?.getAttribute("data-drop");
+
+    setActiveDrop(dropId ?? null);
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!dragId) return;
+
+    dragEl.current?.classList.remove("is-dragging");
+    dragEl.current?.releasePointerCapture(e.pointerId);
+
+    if (activeDrop === "bank") placeToBank();
+    else if (activeDrop) placeToGroup(activeDrop);
+
+    setDragId(null);
+    setActiveDrop(null);
+  };
+
+  /* ---------------- submit ---------------- */
+
+  const allPlaced =
+    Object.values(placed).flat().length === initialBank.length;
 
   const submit = () => {
     if (!allPlaced) return;
-
-    const correct = Object.entries(placed).every(([gid, cards]) =>
-      (cards ?? []).every((c) => c.correctGroupId === gid)
+    const ok = Object.entries(placed).every(([gid, cards]) =>
+      cards.every((c) => c.correctGroupId === gid)
     );
-
-    onAnswer(correct);
+    onAnswer(ok);
   };
 
   return (
@@ -129,7 +154,7 @@ const QuizMatchingQuestion = ({
       <div
         className="matching-grid"
         style={{
-          gridTemplateColumns: `repeat(${columns.length}, minmax(180px, 1fr))`,
+          gridTemplateColumns: `repeat(${columns.length}, minmax(160px, 1fr))`,
         }}
       >
         {columns.map((col) => (
@@ -137,17 +162,19 @@ const QuizMatchingQuestion = ({
             <div className="matching-head">{col.header}</div>
 
             <div
-              className={`matching-dropzone ${dragId ? "is-dragging" : ""}`}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={() => dropToGroup(col.id)}
+              className="matching-dropzone"
+              data-drop={col.id}
+              data-active={activeDrop === col.id}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
             >
               {(placed[col.id] ?? []).map((card) => (
                 <div
                   key={card.id}
                   className="matching-card"
-                  draggable
-                  onDragStart={() => setDragId(card.id)}
-                  onDragEnd={() => setDragId(null)}
+                  onPointerDown={(e) => onPointerDown(e, card.id)}
+                  onPointerMove={onPointerMove}
+                  onPointerUp={onPointerUp}
                 >
                   {card.text}
                 </div>
@@ -159,19 +186,20 @@ const QuizMatchingQuestion = ({
 
       <div className="matching-bank-wrap">
         <div className="matching-bank-title">Válaszok</div>
-
         <div
           className="matching-bank"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={dropToBank}
+          data-drop="bank"
+          data-active={activeDrop === "bank"}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
         >
           {bank.map((card) => (
             <div
               key={card.id}
               className="matching-card"
-              draggable
-              onDragStart={() => setDragId(card.id)}
-              onDragEnd={() => setDragId(null)}
+              onPointerDown={(e) => onPointerDown(e, card.id)}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
             >
               {card.text}
             </div>
@@ -179,7 +207,11 @@ const QuizMatchingQuestion = ({
         </div>
       </div>
 
-      <button className="matching-submit" disabled={!allPlaced} onClick={submit}>
+      <button
+        className="matching-submit"
+        disabled={!allPlaced}
+        onClick={submit}
+      >
         Ellenőrzés
       </button>
     </div>

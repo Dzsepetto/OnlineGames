@@ -1,16 +1,29 @@
 <?php
 
-header("Access-Control-Allow-Origin: http://localhost:5173");
+$allowedOrigins = [
+    "https://dzsepetto.hu",
+    "https://www.dzsepetto.hu",
+];
+
+if (
+    isset($_SERVER["HTTP_ORIGIN"]) &&
+    in_array($_SERVER["HTTP_ORIGIN"], $allowedOrigins, true)
+) {
+    header("Access-Control-Allow-Origin: " . $_SERVER["HTTP_ORIGIN"]);
+    header("Vary: Origin");
+}
+
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Credentials: true");
 
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(204);
     exit;
 }
 
+header("Content-Type: application/json; charset=utf-8");
 
-
-header("Content-Type: application/json");
 require __DIR__ . "/db.php";
 
 $sql = "
@@ -27,4 +40,4 @@ $sql = "
 $stmt = $pdo->query($sql);
 $quizzes = $stmt->fetchAll();
 
-echo json_encode($quizzes);
+echo json_encode($quizzes, JSON_UNESCAPED_UNICODE);

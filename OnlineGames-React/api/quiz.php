@@ -1,9 +1,24 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:5173");
+
+$allowedOrigins = [
+    "https://dzsepetto.hu",
+    "https://www.dzsepetto.hu",
+];
+
+if (
+    isset($_SERVER["HTTP_ORIGIN"]) &&
+    in_array($_SERVER["HTTP_ORIGIN"], $allowedOrigins, true)
+) {
+    header("Access-Control-Allow-Origin: " . $_SERVER["HTTP_ORIGIN"]);
+    header("Vary: Origin");
+}
+
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Credentials: true");
 
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(204);
     exit;
 }
 
@@ -76,7 +91,7 @@ foreach ($questions as &$q) {
             foreach ($items as $it) {
                 if ($it["SIDE"] === "LEFT") {
                     $left[] = $it["TEXT"];
-                } else if ($it["SIDE"] === "RIGHT") {
+                } elseif ($it["SIDE"] === "RIGHT") {
                     $right[] = $it["TEXT"];
                 }
             }
@@ -84,7 +99,7 @@ foreach ($questions as &$q) {
             $q["GROUPS"][] = [
                 "ID" => $groupId,
                 "LEFT" => $left,
-                "RIGHT" => $right
+                "RIGHT" => $right,
             ];
         }
 
@@ -106,4 +121,4 @@ $quiz["QUESTIONS"] = $questions;
 
 echo json_encode([
     "QUIZ" => $quiz
-]);
+], JSON_UNESCAPED_UNICODE);
