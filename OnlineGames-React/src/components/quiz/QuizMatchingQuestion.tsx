@@ -5,7 +5,7 @@ import "../../styles/quiz.css";
 type Card = {
   id: string;
   text: string;
-  correctGroupId: string;
+  correctLeft: string;
 };
 
 const shuffle = <T,>(arr: T[]) => {
@@ -24,25 +24,26 @@ const QuizMatchingQuestion = ({
   question: QuizQuestion;
   onAnswer: (correct: boolean) => void;
 }) => {
-  const groups = question.groups ?? [];
+  const pairs = question.pairs ?? [];
 
   const columns = useMemo(
     () =>
-      groups.map((g) => ({
-        id: g.id,
-        header: g.left[0] ?? "—",
+      pairs.map((p, idx) => ({
+        id: `col-${idx}`,
+        header: p.left || "—",
+        leftKey: p.left,
       })),
     [question.id]
   );
 
   const initialBank = useMemo<Card[]>(() => {
     const cards: Card[] = [];
-    for (const g of groups) {
-      for (const r of g.right) {
+    for (const p of pairs) {
+      for (const r of p.rights) {
         cards.push({
-          id: `${g.id}::${r}`,
+          id: `${p.left}::${r}`,
           text: r,
-          correctGroupId: g.id,
+          correctLeft: p.left,
         });
       }
     }
@@ -71,7 +72,7 @@ const QuizMatchingQuestion = ({
     setPlaced((p) => {
       const next: Record<string, Card[]> = {};
       for (const gid in p) {
-        next[gid] = p[gid].filter((c) => c.id !== id);
+        next[gid] = (p[gid] ?? []).filter((c) => c.id !== id);
       }
       return next;
     });
@@ -98,12 +99,7 @@ const QuizMatchingQuestion = ({
     setBank((b) => [...b, card]);
   };
 
-  /* ---------------- pointer handlers ---------------- */
-
-  const onPointerDown = (
-    e: React.PointerEvent<HTMLDivElement>,
-    id: string
-  ) => {
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>, id: string) => {
     e.preventDefault();
     setDragId(id);
     dragEl.current = e.currentTarget;
@@ -113,11 +109,9 @@ const QuizMatchingQuestion = ({
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragId) return;
-
     const el = document.elementFromPoint(e.clientX, e.clientY);
     const drop = el?.closest("[data-drop]");
     const dropId = drop?.getAttribute("data-drop");
-
     setActiveDrop(dropId ?? null);
   };
 
@@ -134,16 +128,16 @@ const QuizMatchingQuestion = ({
     setActiveDrop(null);
   };
 
-  /* ---------------- submit ---------------- */
-
-  const allPlaced =
-    Object.values(placed).flat().length === initialBank.length;
+  const allPlaced = Object.values(placed).flat().length === initialBank.length;
 
   const submit = () => {
     if (!allPlaced) return;
-    const ok = Object.entries(placed).every(([gid, cards]) =>
-      cards.every((c) => c.correctGroupId === gid)
-    );
+
+    const ok = columns.every((col) => {
+      const cards = placed[col.id] ?? [];
+      return cards.every((c) => c.correctLeft === col.leftKey);
+    });
+
     onAnswer(ok);
   };
 
@@ -207,11 +201,7 @@ const QuizMatchingQuestion = ({
         </div>
       </div>
 
-      <button
-        className="matching-submit"
-        disabled={!allPlaced}
-        onClick={submit}
-      >
+      <button className="matching-submit" disabled={!allPlaced} onClick={submit}>
         Ellenőrzés
       </button>
     </div>

@@ -2,17 +2,6 @@
 require __DIR__ . "/../bootstrap.php";
 require __DIR__ . "/../db.php";
 
-$isLocal = strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
-
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => $isLocal ? null : '.dzsepetto.hu',
-    'secure' => !$isLocal,
-    'httponly' => true,
-    'samesite' => $isLocal ? 'Lax' : 'None',
-]);
-
 session_start();
 
 $data = json_decode(file_get_contents("php://input"), true);
@@ -58,13 +47,13 @@ $name  = $payload['name'] ?? "";
 /**
  * 👤 User keresés / létrehozás
  */
-$stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+$stmt = $pdo->prepare("SELECT id FROM USERS WHERE email = ?");
 $stmt->execute([$email]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
     $stmt = $pdo->prepare(
-        "INSERT INTO users (email, name) VALUES (?, ?)"
+        "INSERT INTO USERS (email, name) VALUES (?, ?)"
     );
     $stmt->execute([$email, $name]);
     $userId = $pdo->lastInsertId();

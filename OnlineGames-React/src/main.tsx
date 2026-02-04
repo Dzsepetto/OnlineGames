@@ -11,7 +11,10 @@ import "./styles/buttons.css";
 import "./styles/cards.css";
 import "./styles/quiz.css";
 
-const CLIENT_ID = ""
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+if (!CLIENT_ID) {
+  console.error("Missing VITE_GOOGLE_CLIENT_ID in .env");
+}
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

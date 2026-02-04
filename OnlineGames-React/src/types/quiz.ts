@@ -2,7 +2,8 @@ export type Quiz = {
   id: string;
   slug: string;
   title: string;
-  description: string;
+  description: string | null;
+  creator_name?: string;
 };
 
 export type QuizAnswer = {
@@ -10,17 +11,15 @@ export type QuizAnswer = {
   correct: boolean;
 };
 
-export type MatchingGroup = {
-  id: string;
-  left: string[];
-  right: string[];
+export type MatchingPair = {
+  left: string;
+  rights: string[];
 };
 
 export type QuizQuestion = {
   id: string;
-  type: "SINGLE" | "MULTI" | "MATCHING";
+  type: "MULTIPLE_CHOICE" | "MATCHING";
   question: string;
-
   answers?: QuizAnswer[];
-  groups?: MatchingGroup[];
+  pairs?: MatchingPair[];
 };

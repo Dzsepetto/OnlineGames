@@ -22,3 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 header("Content-Type: application/json; charset=utf-8");
+
+$isLocal = strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost') !== false;
+
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => $isLocal ? null : '.dzsepetto.hu',
+    'secure' => !$isLocal,
+    'httponly' => true,
+    'samesite' => $isLocal ? 'Lax' : 'None',
+]);

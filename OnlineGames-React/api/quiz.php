@@ -17,7 +17,7 @@ $quizStmt = $pdo->prepare("
     LIMIT 1
 ");
 $quizStmt->execute([$key, $key]);
-$quiz = $quizStmt->fetch();
+$quiz = $quizStmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$quiz) {
     http_response_code(404);
@@ -29,72 +29,61 @@ $questionStmt = $pdo->prepare("
     SELECT ID, QUESTION_TEXT, TYPE
     FROM QUESTION
     WHERE QUIZ_ID = ?
-    ORDER BY ID
+    ORDER BY ORDER_INDEX, ID
 ");
 $questionStmt->execute([$quiz["ID"]]);
-$questions = $questionStmt->fetchAll();
+$questions = $questionStmt->fetchAll(PDO::FETCH_ASSOC);
+
+$answerStmt = $pdo->prepare("
+    SELECT
+        LABEL AS ANSWER_TEXT,
+        IS_CORRECT
+    FROM ANSWER_OPTION
+    WHERE QUESTION_ID = ?
+    ORDER BY ORDER_INDEX, ID
+");
+
+$pairStmt = $pdo->prepare("
+    SELECT
+        P.LEFT_ID,
+        L.TEXT AS LEFT_TEXT,
+        P.RIGHT_ID,
+        R.TEXT AS RIGHT_TEXT
+    FROM MATCHING_PAIR P
+    JOIN MATCHING_LEFT_ITEM L ON L.ID = P.LEFT_ID
+    JOIN MATCHING_RIGHT_ITEM R ON R.ID = P.RIGHT_ID
+    WHERE P.QUESTION_ID = ?
+    ORDER BY L.ORDER_INDEX, R.ORDER_INDEX, P.ID
+");
 
 foreach ($questions as &$q) {
-    if ($q["TYPE"] === "MATCHING") {
+    if (($q["TYPE"] ?? "") === "MATCHING") {
+        $pairStmt->execute([$q["ID"]]);
+        $rows = $pairStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $groupStmt = $pdo->prepare("
-            SELECT ID
-            FROM MATCHING_GROUP
-            WHERE QUESTION_ID = ?
-            ORDER BY COALESCE(ORDER_INDEX, 2147483647), ID
-        ");
-        $groupStmt->execute([$q["ID"]]);
-        $groups = $groupStmt->fetchAll();
+        // LEFT_ID -> aggregated rights
+        $byLeft = [];
 
-        $itemStmt = $pdo->prepare("
-            SELECT SIDE, TEXT
-            FROM MATCHING_ITEM
-            WHERE GROUP_ID = ?
-            ORDER BY ORDER_INDEX, ID
-        ");
-
-        $q["GROUPS"] = [];
-
-        foreach ($groups as $g) {
-            $groupId = $g["ID"];
-
-            $itemStmt->execute([$groupId]);
-            $items = $itemStmt->fetchAll();
-
-            $left = [];
-            $right = [];
-
-            foreach ($items as $it) {
-                if ($it["SIDE"] === "LEFT") {
-                    $left[] = $it["TEXT"];
-                } elseif ($it["SIDE"] === "RIGHT") {
-                    $right[] = $it["TEXT"];
-                }
+        foreach ($rows as $row) {
+            $leftId = $row["LEFT_ID"];
+            if (!isset($byLeft[$leftId])) {
+                $byLeft[$leftId] = [
+                    "ID" => $leftId,
+                    "LEFT" => [ (string)$row["LEFT_TEXT"] ],
+                    "RIGHT" => [],
+                ];
             }
-
-            $q["GROUPS"][] = [
-                "ID" => $groupId,
-                "LEFT" => $left,
-                "RIGHT" => $right,
-            ];
+            $byLeft[$leftId]["RIGHT"][] = (string)$row["RIGHT_TEXT"];
         }
 
+        // Keep order as produced by SQL
+        $q["GROUPS"] = array_values($byLeft);
     } else {
-        $answerStmt = $pdo->prepare("
-            SELECT 
-                LABEL AS ANSWER_TEXT,
-                IS_CORRECT
-            FROM ANSWER_OPTION
-            WHERE QUESTION_ID = ?
-            ORDER BY ID
-        ");
         $answerStmt->execute([$q["ID"]]);
-        $q["ANSWERS"] = $answerStmt->fetchAll();
+        $q["ANSWERS"] = $answerStmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 
 $quiz["QUESTIONS"] = $questions;
 
-echo json_encode([
-    "QUIZ" => $quiz
-], JSON_UNESCAPED_UNICODE);
+echo json_encode(["QUIZ" => $quiz], JSON_UNESCAPED_UNICODE);

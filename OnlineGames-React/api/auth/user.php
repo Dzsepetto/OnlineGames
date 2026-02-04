@@ -11,7 +11,7 @@ if (!isset($_SESSION["user_id"])) {
 
 $stmt = $pdo->prepare("
     SELECT email, name
-    FROM users
+    FROM USERS
     WHERE id = ?
 ");
 $stmt->execute([$_SESSION["user_id"]]);

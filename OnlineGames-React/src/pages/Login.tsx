@@ -9,10 +9,10 @@ const Login = () => {
   return (
    <GoogleLogin
   onSuccess={async (cred) => {
-    console.log("Google success", cred);
+    //console.log("Google success", cred);
 
     if (!cred.credential) {
-      console.log("No credential");
+      //console.log("No credential");
       return;
     }
 
@@ -23,16 +23,16 @@ const Login = () => {
       body: JSON.stringify({ token: cred.credential }),
     });
 
-    console.log("google.php status:", res.status);
+    //console.log("google.php status:", res.status);
 
 const text = await res.text();
 console.log("RAW google.php response:", text);
 
 
 
-    console.log("Refreshing user...");
+    //console.log("Refreshing user...");
     await refreshUser();
-    console.log("User refreshed");
+    //console.log("User refreshed");
 
     navigate("/");
   }}

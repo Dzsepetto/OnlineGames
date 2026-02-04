@@ -1,0 +1,183 @@
+.cq-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: sans-serif;
+}
+
+.cq-title {
+  margin: 0 0 16px 0;
+}
+
+.cq-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+}
+
+.cq-section--meta {
+  border-bottom: 1px solid #ccc;
+}
+
+.cq-input {
+  padding: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cq-input--title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.cq-textarea {
+  width: 100%;
+  height: 80px;
+  padding: 8px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.cq-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.cq-row {
+  display: flex;
+  gap: 10px;
+}
+
+.cq-row--header {
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.cq-qnum {
+  font-weight: bold;
+}
+
+.cq-select {
+  padding: 8px;
+}
+
+.cq-body {
+  margin-top: 8px;
+}
+
+.cq-body--indent {
+  margin-left: 25px;
+}
+
+.cq-body--matching {
+  margin-left: 25px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.cq-subtitle {
+  margin: 0 0 10px 0;
+}
+
+.cq-row--answer {
+  margin-top: 8px;
+  align-items: center;
+}
+
+.cq-input--answer {
+  padding: 5px;
+}
+
+.cq-iconbtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0 6px;
+  font-size: 1rem;
+}
+
+.cq-btn {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 10px 20px;
+}
+
+.cq-btn--primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.cq-btn--save {
+  padding: 15px 40px;
+  background-color: #28a745;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.cq-btn--secondary {
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: #e9ecef;
+  color: #111;
+  border: 1px solid #ced4da;
+}
+
+.cq-btn--gray {
+  padding: 8px;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 4px;
+}
+
+.cq-btn--danger {
+  background-color: #ff4444;
+  color: white;
+  border-radius: 4px;
+  padding: 6px 10px;
+}
+
+.cq-btn--outlineDanger {
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  background: white;
+  border-radius: 4px;
+  padding: 6px 10px;
+}
+
+.cq-pair {
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.cq-row--pairTop {
+  align-items: center;
+}
+
+.cq-rights {
+  margin-top: 10px;
+}
+
+.cq-label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.cq-row--right {
+  margin-top: 6px;
+  align-items: center;
+}
+
+.cq-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  align-items: center;
+}

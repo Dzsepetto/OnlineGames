@@ -1,4 +1,6 @@
 <?php
+// api/db.php
+
 
 $pdo = new PDO(
     "mysql:host=localhost;dbname=dzsepetto_online_quiz;charset=utf8mb4",
