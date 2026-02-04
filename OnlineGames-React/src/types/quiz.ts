@@ -4,6 +4,7 @@ export type Quiz = {
   title: string;
   description: string | null;
   creator_name?: string;
+  created_by?: string;
 };
 
 export type QuizAnswer = {

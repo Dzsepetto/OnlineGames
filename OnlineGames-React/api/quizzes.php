@@ -8,6 +8,7 @@ $sql = "
         Q.SLUG, 
         Q.TITLE, 
         Q.DESCRIPTION,
+        Q.CREATED_BY,
         U.NAME AS CREATOR_NAME
     FROM QUIZ Q
     LEFT JOIN USERS U ON Q.CREATED_BY = U.ID
@@ -18,8 +19,8 @@ $sql = "
 try {
     $stmt = $pdo->query($sql);
     $quizzes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    header('Content-Type: application/json');
+
+    header("Content-Type: application/json; charset=utf-8");
     echo json_encode($quizzes, JSON_UNESCAPED_UNICODE);
 } catch (PDOException $e) {
     http_response_code(500);

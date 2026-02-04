@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { QuizQuestion, MatchingPair } from "../types/quiz";
 import "../styles/createQuiz.css";
+import { createQuiz } from "../services/quizService";
 
 type QuestionType = "MULTIPLE_CHOICE" | "MATCHING";
 
@@ -75,63 +76,39 @@ const CreateQuiz = () => {
     });
   };
 
-  const submitQuiz = async () => {
-    if (!title.trim()) {
-      alert("Kérlek, adj meg egy címet a kvíznek!");
-      return;
-    }
+const submitQuiz = async () => {
+  if (!title.trim()) {
+    alert("Kérlek, adj meg egy címet a kvíznek!");
+    return;
+  }
 
-    const payload = {
-      title: title.trim(),
-      description,
-      questions: questions.map((q) => ({
-        text: (q.question ?? "").trim(),
-        type: q.type,
-        answers:
-          q.type === "MULTIPLE_CHOICE"
-            ? q.answers.map((a) => ({ text: a.text, isCorrect: a.correct }))
-            : [],
-        pairs: q.type === "MATCHING" ? q.pairs : [],
-      })),
-    };
-
-    console.log("PAYLOAD:", payload);
-
-    try {
-      const res = await fetch("https://dzsepetto.hu/api/create_quiz.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
-
-      console.log("STATUS:", res.status);
-      console.log("HEADERS:", [...res.headers.entries()]);
-
-      const raw = await res.text();
-      console.log("RAW RESPONSE FROM PHP:");
-      console.log(raw);
-
-      let data: any = null;
-      try {
-        data = JSON.parse(raw);
-      } catch {
-        data = null;
-      }
-
-      console.log("PARSED JSON:", data);
-
-      if (res.ok) {
-        alert("Kvíz sikeresen létrehozva!");
-        navigate("/quizzes");
-      } else {
-        alert("Hiba történt: " + (data?.error || "Ismeretlen hiba"));
-      }
-    } catch (err) {
-      console.error("Submit error:", err);
-      alert("Hálózati hiba a mentés során.");
-    }
+  const payload = {
+    title: title.trim(),
+    description,
+    questions: questions.map((q) => ({
+      text: (q.question ?? "").trim(),
+      type: q.type,
+      answers:
+        q.type === "MULTIPLE_CHOICE"
+          ? q.answers.map((a) => ({ text: a.text, isCorrect: a.correct }))
+          : [],
+      pairs: q.type === "MATCHING" ? q.pairs : [],
+    })),
   };
+
+  console.log("PAYLOAD:", payload);
+
+  try {
+    const created = await createQuiz(payload);
+    console.log("CREATED:", created);
+    alert("Kvíz sikeresen létrehozva!");
+    navigate("/quizzes");
+  } catch (err: any) {
+    console.error("CreateQuiz error:", err);
+    alert("Hiba történt: " + (err?.message || "Ismeretlen hiba"));
+  }
+};
+
 
   return (
     <div className="cq-container">

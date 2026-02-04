@@ -1,33 +1,6 @@
 import { API_BASE } from "../config/api";
-import type { Quiz, QuizQuestion } from "../types/quiz";
-
-type ApiAnswer = {
-  ANSWER_TEXT: string;
-  IS_CORRECT: number | string;
-};
-
-type ApiGroup = {
-  ID: string;
-  LEFT: string[];
-  RIGHT: string[];
-};
-
-type ApiQuestion = {
-  ID: string;
-  QUESTION_TEXT: string;
-  TYPE: "MULTIPLE_CHOICE" | "MATCHING";
-  ANSWERS?: ApiAnswer[];
-  GROUPS?: ApiGroup[];
-};
-
-type ApiQuizResponse = {
-  QUIZ: {
-    ID: string;
-    TITLE: string;
-    DESCRIPTION: string | null;
-    QUESTIONS: ApiQuestion[];
-  };
-};
+import type { Quiz, QuizQuestion, MatchingPair } from "../types/quiz";
+import type { ApiQuizResponse, ApiQuestion } from "./quizApi.types";
 
 const toBool = (v: any) => v === 1 || v === "1" || v === true;
 
@@ -39,59 +12,107 @@ export async function getQuizzes(): Promise<Quiz[]> {
   if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
 
   return (data ?? []).map((q: any) => ({
-    id: q.ID ?? q.id,
+    id: String(q.ID ?? q.id),
     slug: q.SLUG ?? q.slug,
     title: q.TITLE ?? q.title,
     description: q.DESCRIPTION ?? q.description ?? null,
     creator_name: q.CREATOR_NAME ?? q.creator_name,
+    created_by: q.CREATED_BY != null ? String(q.CREATED_BY) : undefined,
   }));
 }
 
 export async function getQuizQuestions(slugOrId: string): Promise<QuizQuestion[]> {
-  const res = await fetch(`${API_BASE}/quiz.php?slug=${encodeURIComponent(slugOrId)}`, {
-    credentials: "include",
-  });
+  const res = await fetch(
+    `${API_BASE}/quiz.php?slug=${encodeURIComponent(slugOrId)}`,
+    { credentials: "include" }
+  );
 
   const raw = await res.text();
 
-  let json: ApiQuizResponse | null = null;
+  let json: ApiQuizResponse;
   try {
     json = JSON.parse(raw);
   } catch {
     throw new Error("Invalid JSON from quiz.php:\n" + raw.slice(0, 300));
   }
 
-  if (!res.ok) {
-    throw new Error((json as any)?.error ?? `HTTP ${res.status}`);
-  }
+  if (!res.ok) throw new Error((json as any)?.error ?? `HTTP ${res.status}`);
 
   const apiQuestions = json?.QUIZ?.QUESTIONS ?? [];
 
-  return apiQuestions.map((q): QuizQuestion => {
+  return apiQuestions.map((q: ApiQuestion): QuizQuestion => {
     if (q.TYPE === "MATCHING") {
-      const pairs = (q.GROUPS ?? []).map((g) => ({
-        left: (g.LEFT?.[0] ?? "").toString(),
-        rights: (g.RIGHT ?? []).map((x) => x.toString()),
-      }));
-
       return {
         id: q.ID,
         type: "MATCHING",
         question: q.QUESTION_TEXT,
-        pairs,
+        pairs: (q.GROUPS ?? []).map((g) => ({
+          left: (g.LEFT?.[0] ?? "").toString(),
+          rights: (g.RIGHT ?? []).map((x) => x.toString()),
+        })),
       };
     }
-
-    const answers = (q.ANSWERS ?? []).map((a) => ({
-      text: a.ANSWER_TEXT,
-      correct: toBool(a.IS_CORRECT),
-    }));
 
     return {
       id: q.ID,
       type: "MULTIPLE_CHOICE",
       question: q.QUESTION_TEXT,
-      answers,
+      answers: (q.ANSWERS ?? []).map((a) => ({
+        text: a.ANSWER_TEXT,
+        correct: toBool(a.IS_CORRECT),
+      })),
     };
   });
+}
+
+export async function deleteQuiz(quizId: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/delete_quiz.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ quiz_id: quizId }),
+  });
+
+  const raw = await res.text();
+  let data: any = null;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    data = null;
+  }
+
+  if (!res.ok) throw new Error(data?.error || `Delete failed (HTTP ${res.status})`);
+}
+
+export type CreateQuizPayload = {
+  title: string;
+  description: string;
+  questions: Array<{
+    text: string;
+    type: "MULTIPLE_CHOICE" | "MATCHING";
+    answers: Array<{ text: string; isCorrect: boolean }>;
+    pairs: MatchingPair[];
+  }>;
+};
+
+export async function createQuiz(payload: CreateQuizPayload): Promise<{ quiz_id: string; slug: string }> {
+  const res = await fetch(`${API_BASE}/create_quiz.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  const raw = await res.text();
+
+  let data: any = null;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    throw new Error("Invalid JSON from create_quiz.php:\n" + raw.slice(0, 300));
+  }
+
+  if (!res.ok) throw new Error(data?.error || `Create failed (HTTP ${res.status})`);
+
+  return { quiz_id: String(data.quiz_id), slug: String(data.slug) };
 }

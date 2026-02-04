@@ -18,4 +18,10 @@ $stmt->execute([$_SESSION["user_id"]]);
 
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-echo json_encode(["user" => $user]);
+echo json_encode([
+  "user" => [
+    "id" => $_SESSION["user_id"],
+    "email" => $user["email"],
+    "name" => $user["name"],
+  ]
+]);

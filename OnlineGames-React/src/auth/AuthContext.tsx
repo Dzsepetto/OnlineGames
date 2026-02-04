@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { API_BASE } from "../config/api";
 
 type User = {
+  id: string;
   email: string;
   name: string;
 };
@@ -18,15 +20,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshUser = async () => {
     try {
-      const res = await fetch("https://dzsepetto.hu/api/auth/user.php", {
+      const res = await fetch(`${API_BASE}/auth/user.php`, {
         credentials: "include",
       });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user ?? null);
-      } else {
+
+      if (!res.ok) {
         setUser(null);
+        return;
       }
+
+      const data = await res.json().catch(() => null);
+
+      if (!data?.user) {
+        setUser(null);
+        return;
+      }
+
+      const u = data.user;
+
+      // Biztosítsuk a típust + legyen id string
+      if (u.id == null || u.email == null || u.name == null) {
+        setUser(null);
+        return;
+      }
+
+      setUser({
+        id: String(u.id),
+        email: String(u.email),
+        name: String(u.name),
+      });
     } catch (error) {
       console.error("Hiba a felhasználó lekérésekor:", error);
       setUser(null);
@@ -35,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await fetch("https://dzsepetto.hu/api/auth/logout.php", {
+      await fetch(`${API_BASE}/auth/logout.php`, {
         method: "POST",
         credentials: "include",
       });
