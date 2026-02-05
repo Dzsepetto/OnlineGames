@@ -1,40 +1,50 @@
 <?php
-require_once __DIR__ . "/bootstrap.php";
-require_once __DIR__ . "/db.php";
+require __DIR__ . "/bootstrap.php";
+require __DIR__ . "/db.php";
 
 session_start();
-
 header("Content-Type: application/json; charset=utf-8");
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION["user_id"])) {
     http_response_code(401);
-    echo json_encode(["error" => "Bejelentkezés szükséges!"]);
+    echo json_encode(["error" => "Bejelentkezés szükséges!"], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$creatorId = $_SESSION['user_id'];
+$creatorId = (string)$_SESSION["user_id"];
+
 $raw = file_get_contents("php://input");
 $data = json_decode($raw, true);
 
 if (json_last_error() !== JSON_ERROR_NONE) {
     http_response_code(400);
-    echo json_encode(["error" => "JSON hiba: " . json_last_error_msg()]);
+    echo json_encode([
+        "error" => "JSON hiba: " . json_last_error_msg(),
+        "debug" => ["raw" => mb_substr($raw, 0, 500)]
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 if (
-    !$data ||
-    empty($data['title']) ||
-    !isset($data['questions']) ||
-    !is_array($data['questions'])
+    !is_array($data) ||
+    empty($data["title"]) ||
+    !isset($data["questions"]) ||
+    !is_array($data["questions"])
 ) {
     http_response_code(400);
-    echo json_encode(["error" => "Hiányzó adatok (title/questions)."]);
+    echo json_encode([
+        "error" => "Hiányzó adatok",
+        "debug" => [
+            "has_data" => is_array($data),
+            "title" => isset($data["title"]) ? $data["title"] : null,
+            "questions_is_array" => isset($data["questions"]) && is_array($data["questions"]),
+        ],
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-function db_uuid(PDO $pdo): string {
-    return (string)$pdo->query("select uuid()")->fetchColumn();
+function db_uuid(PDO $pdo) {
+    return (string)$pdo->query("SELECT UUID()")->fetchColumn();
 }
 
 try {
@@ -45,75 +55,83 @@ try {
 
     $quizId = db_uuid($pdo);
 
-    $title = trim((string)$data['title']);
-    $description = isset($data['description']) ? (string)$data['description'] : '';
+    $title = trim((string)$data["title"]);
+    $description = isset($data["description"]) ? (string)$data["description"] : "";
 
+    // slug
     $baseSlug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title), '-'));
-    if ($baseSlug === '') $baseSlug = 'quiz';
+    if ($baseSlug === "") $baseSlug = "quiz";
     $slug = $baseSlug . "-" . substr(bin2hex(random_bytes(4)), 0, 6);
 
+    // QUIZ insert
     $stmt = $pdo->prepare("
-        insert into QUIZ (ID, SLUG, TITLE, DESCRIPTION, IS_PUBLISHED, CREATED_BY)
-        values (?, ?, ?, ?, 1, ?)
+        INSERT INTO QUIZ (ID, SLUG, TITLE, DESCRIPTION, IS_PUBLISHED, CREATED_BY)
+        VALUES (?, ?, ?, ?, 1, ?)
     ");
     $stmt->execute([$quizId, $slug, $title, $description, $creatorId]);
 
+    // prepared statements
     $insertQuestion = $pdo->prepare("
-        insert into QUESTION (ID, QUIZ_ID, TYPE, QUESTION_TEXT, ORDER_INDEX)
-        values (?, ?, ?, ?, ?)
+        INSERT INTO QUESTION (ID, QUIZ_ID, TYPE, QUESTION_TEXT, ORDER_INDEX)
+        VALUES (?, ?, ?, ?, ?)
     ");
 
     $insertAnswer = $pdo->prepare("
-        insert into ANSWER_OPTION (ID, QUESTION_ID, LABEL, IS_CORRECT, ORDER_INDEX)
-        values (?, ?, ?, ?, ?)
+        INSERT INTO ANSWER_OPTION (ID, QUESTION_ID, LABEL, IS_CORRECT, ORDER_INDEX)
+        VALUES (?, ?, ?, ?, ?)
     ");
 
     $insertLeft = $pdo->prepare("
-        insert into MATCHING_LEFT_ITEM (ID, QUESTION_ID, TEXT, ORDER_INDEX)
-        values (?, ?, ?, ?)
+        INSERT INTO MATCHING_LEFT_ITEM (ID, QUESTION_ID, TEXT, ORDER_INDEX)
+        VALUES (?, ?, ?, ?)
     ");
 
     $insertRight = $pdo->prepare("
-        insert into MATCHING_RIGHT_ITEM (ID, QUESTION_ID, TEXT, ORDER_INDEX)
-        values (?, ?, ?, ?)
+        INSERT INTO MATCHING_RIGHT_ITEM (ID, QUESTION_ID, TEXT, ORDER_INDEX)
+        VALUES (?, ?, ?, ?)
     ");
 
     $insertPair = $pdo->prepare("
-        insert into MATCHING_PAIR (ID, QUESTION_ID, LEFT_ID, RIGHT_ID)
-        values (?, ?, ?, ?)
+        INSERT INTO MATCHING_PAIR (ID, QUESTION_ID, LEFT_ID, RIGHT_ID)
+        VALUES (?, ?, ?, ?)
     ");
 
-    foreach ($data['questions'] as $index => $q) {
+    // questions loop
+    $qOrder = 0;
+    foreach ($data["questions"] as $q) {
         if (!is_array($q)) continue;
 
-        $type = isset($q['type']) ? (string)$q['type'] : '';
-        $qText = isset($q['text']) ? trim((string)$q['text']) : '';
+        $type = isset($q["type"]) ? (string)$q["type"] : "";
+        $qText = isset($q["text"]) ? trim((string)$q["text"]) : "";
 
-        if ($type === '' || $qText === '') continue;
+        if ($type === "" || $qText === "") continue;
 
+        $qOrder++;
         $questionId = db_uuid($pdo);
-        $insertQuestion->execute([$questionId, $quizId, $type, $qText, (int)$index + 1]);
+        $insertQuestion->execute([$questionId, $quizId, $type, $qText, $qOrder]);
 
-        if ($type === 'MULTIPLE_CHOICE') {
-            $answers = isset($q['answers']) && is_array($q['answers']) ? $q['answers'] : [];
+        // MULTIPLE_CHOICE
+        if ($type === "MULTIPLE_CHOICE") {
+            $answers = (isset($q["answers"]) && is_array($q["answers"])) ? $q["answers"] : [];
 
             $aOrder = 0;
             foreach ($answers as $ans) {
                 if (!is_array($ans)) continue;
 
-                $label = isset($ans['text']) ? trim((string)$ans['text']) : '';
-                if ($label === '') continue;
+                $label = isset($ans["text"]) ? trim((string)$ans["text"]) : "";
+                if ($label === "") continue;
 
                 $aOrder++;
-                $isCorrect = !empty($ans['isCorrect']) ? 1 : 0;
+                $isCorrect = (!empty($ans["isCorrect"])) ? 1 : 0;
                 $answerId = db_uuid($pdo);
 
                 $insertAnswer->execute([$answerId, $questionId, $label, $isCorrect, $aOrder]);
             }
         }
 
-        if ($type === 'MATCHING') {
-            $pairs = isset($q['pairs']) && is_array($q['pairs']) ? $q['pairs'] : [];
+        // MATCHING
+        if ($type === "MATCHING") {
+            $pairs = (isset($q["pairs"]) && is_array($q["pairs"])) ? $q["pairs"] : [];
 
             $leftIdByText = [];
             $rightIdByText = [];
@@ -123,20 +141,22 @@ try {
             foreach ($pairs as $pair) {
                 if (!is_array($pair)) continue;
 
-                $leftText = isset($pair['left']) ? trim((string)$pair['left']) : '';
-                if ($leftText === '') continue;
+                $leftText = isset($pair["left"]) ? trim((string)$pair["left"]) : "";
+                if ($leftText === "") continue;
 
-                $rights = isset($pair['rights']) && is_array($pair['rights']) ? $pair['rights'] : [];
+                $rights = (isset($pair["rights"]) && is_array($pair["rights"])) ? $pair["rights"] : [];
 
+                // clean rights
                 $cleanRights = [];
                 foreach ($rights as $x) {
                     $t = trim((string)$x);
-                    if ($t !== '') $cleanRights[] = $t;
+                    if ($t !== "") $cleanRights[] = $t;
                 }
                 $rights = array_values($cleanRights);
 
                 if (empty($rights)) continue;
 
+                // LEFT dedupe
                 if (!isset($leftIdByText[$leftText])) {
                     $leftOrder++;
                     $leftId = db_uuid($pdo);
@@ -146,6 +166,7 @@ try {
                     $leftId = $leftIdByText[$leftText];
                 }
 
+                // RIGHT items + PAIRS
                 foreach ($rights as $rText) {
                     if (!isset($rightIdByText[$rText])) {
                         $rightOrder++;
@@ -163,6 +184,16 @@ try {
         }
     }
 
+    // ha nem volt egyetlen valid kérdés sem:
+    if ($qOrder === 0) {
+        $pdo->rollBack();
+        http_response_code(400);
+        echo json_encode([
+            "error" => "Hiányzó adatok: nincs egyetlen érvényes kérdés sem (text/type)."
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     $pdo->commit();
 
     echo json_encode([
@@ -174,9 +205,10 @@ try {
 } catch (PDOException $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
 
-    error_log("SQL ERROR: " . $e->getMessage());
-    error_log("SQL CODE: " . $e->getCode());
-    error_log("SQL TRACE: " . $e->getTraceAsString());
+    // # Log if needed:
+    // error_log("CREATE_QUIZ SQL ERROR: " . $e->getMessage());
+    // error_log("CREATE_QUIZ SQL CODE: " . $e->getCode());
+    // error_log("CREATE_QUIZ TRACE: " . $e->getTraceAsString());
 
     http_response_code(500);
     echo json_encode(["error" => "DB error"], JSON_UNESCAPED_UNICODE);
@@ -184,9 +216,16 @@ try {
 
 } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
+
+    // # Log if needed:
+    // error_log("CREATE_QUIZ ERROR: " . $e->getMessage());
+    // error_log("CREATE_QUIZ TRACE: " . $e->getTraceAsString());
+
     http_response_code(500);
     echo json_encode([
         "error" => $e->getMessage(),
         "code" => $e->getCode()
     ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
+

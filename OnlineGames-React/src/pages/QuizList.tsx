@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getQuizzes, deleteQuiz } from "../services/quizService";
 import type { Quiz } from "../types/quiz";
 import QuizCard from "../components/quiz/QuizCard";
 import { useAuth } from "../auth/AuthContext";
 
 const QuizList = () => {
+  const navigate = useNavigate();
+
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { user } = useAuth();
@@ -33,12 +35,7 @@ const QuizList = () => {
     try {
       setDeletingId(quiz.id);
       await deleteQuiz(quiz.id);
-
-      // gyors UX: azonnal kivesszük a listából
       setQuizzes((prev) => prev.filter((q) => q.id !== quiz.id));
-
-      // opcionális: ha akarsz "hard refresh"-t is:
-      // await load();
     } catch (e: any) {
       alert(e?.message ?? "Törlés sikertelen");
     } finally {
@@ -101,23 +98,29 @@ const QuizList = () => {
                 >
                   <button
                     type="button"
-                    disabled
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      navigate(`/edit-quiz/${quiz.id}`);
+                    }}
                     style={{
                       padding: "6px 10px",
                       borderRadius: "6px",
                       border: "1px solid #ccc",
-                      background: "white",
-                      cursor: "not-allowed",
-                      opacity: 0.6,
+                      background: "green",
+                      cursor: "pointer",
                     }}
-                    title="Szerkesztés (később)"
                   >
                     Edit
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => onDelete(quiz)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onDelete(quiz);
+                    }}
                     disabled={deletingId === quiz.id}
                     style={{
                       padding: "6px 10px",
