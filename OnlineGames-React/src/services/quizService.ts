@@ -192,3 +192,68 @@ export async function updateQuiz(payload: { quiz_id: string } & CreateQuizPayloa
 
   if (!res.ok) throw new Error(data?.error || `Update failed (HTTP ${res.status})`);
 }
+
+export async function getQuizMeta(slug: string) {
+  const res = await fetch(`${API_BASE}/quiz.php?slug=${encodeURIComponent(slug)}`, {
+    credentials: "include",
+  });
+
+  const json = await res.json();
+  if (!res.ok) throw new Error(json?.error ?? "Failed to load quiz");
+
+  const q = json.QUIZ;
+
+  return {
+    id: q.ID,
+    title: q.TITLE,
+    description: q.DESCRIPTION,
+    creator_name: q.CREATOR_NAME,
+    isPublic: q.IS_PUBLIC === 1,
+  };
+}
+
+export async function getQuizResults(quizId: string) {
+  const res = await fetch(`${API_BASE}/get_results.php?quiz_id=${encodeURIComponent(quizId)}`, {
+    credentials: "include",
+  });
+
+  const json = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(json?.error ?? `HTTP ${res.status}`);
+  }
+
+  return {
+    quiz_id: String(json.quiz_id ?? quizId),
+    results: Array.isArray(json.results) ? json.results : [],
+  };
+}
+
+
+export async function saveQuizResult(payload: {
+  quiz_id: string;
+  score: number;
+  max_score: number;
+}) {
+  const res = await fetch(`${API_BASE}/upsert_quiz_attempt.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  const raw = await res.text();
+
+  let json: any;
+  try {
+    json = JSON.parse(raw);
+  } catch {
+    throw new Error("Invalid JSON from upsert_quiz_attempt.php:\n" + raw.slice(0, 300));
+  }
+
+  if (!res.ok) {
+    throw new Error(json?.error ?? `HTTP ${res.status}`);
+  }
+
+  return json;
+}
