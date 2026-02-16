@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getQuizMeta, getQuizResults } from "../../services/quizService";
 import { useAuth } from "../../auth/AuthContext";
-import QuizCountdownModal from "./QuizCountDownModal";
+import QuizCountdownModal from "./QuizCountdownModal";
 
 type QuizMeta = {
   id: string;
