@@ -1,17 +1,18 @@
 /* ================= ROOT CARD ================= */
 
 .cq-card {
-  background: #ffffff;
+  background-color: #1e293b;  /* slate-800 jelleg */
   border-radius: 14px;
   padding: 20px;
   margin-bottom: 22px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+  border: 1px solid #334155;
   transition: all 0.2s ease;
+  color: #e2e8f0;
 }
 
 .cq-card:hover {
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
 }
 
 /* ================= ROWS ================= */
@@ -51,7 +52,7 @@
 .cq-qnum {
   font-weight: 600;
   font-size: 18px;
-  color: #444;
+  color: #94a3b8;
   min-width: 24px;
 }
 
@@ -61,15 +62,17 @@
   flex: 1;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid #334155;
   font-size: 14px;
+  background-color: #1e293b;  /* slate-800 jelleg */
+  color: #e2e8f0;
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cq-input:focus {
   outline: none;
   border-color: #4f8cff;
-  box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.25);
 }
 
 .cq-input--answer {
@@ -81,16 +84,18 @@
   min-height: 90px;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid #334155;
   font-size: 14px;
   resize: vertical;
+ background-color: #1e293b;  /* slate-800 jelleg */
+  color: #e2e8f0;
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cq-textarea:focus {
   outline: none;
   border-color: #4f8cff;
-  box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.25);
 }
 
 /* ================= SELECT ================= */
@@ -98,9 +103,10 @@
 .cq-select {
   padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid #334155;
   font-size: 14px;
-  background: #fff;
+ background-color: #1e293b;  /* slate-800 jelleg */
+  color: #e2e8f0;
   cursor: pointer;
 }
 
@@ -140,40 +146,40 @@
 }
 
 .cq-btn--secondary {
-  background: #f2f4f8;
-  color: #333;
+  background: #334155;
+  color: #e2e8f0;
 }
 
 .cq-btn--secondary:hover {
-  background: #e4e7ec;
+  background: #3f4d63;
 }
 
 .cq-btn--gray {
-  background: #e9ecef;
-  color: #333;
+  background: #475569;
+  color: #e2e8f0;
 }
 
 .cq-btn--gray:hover {
-  background: #dfe3e8;
+  background: #56667f;
 }
 
 .cq-btn--danger {
-  background: #ff5c5c;
+  background: #ef4444;
   color: white;
 }
 
 .cq-btn--danger:hover {
-  background: #e04848;
+  background: #dc2626;
 }
 
 .cq-btn--outlineDanger {
   background: transparent;
-  border: 1px solid #ff5c5c;
-  color: #ff5c5c;
+  border: 1px solid #ef4444;
+  color: #ef4444;
 }
 
 .cq-btn--outlineDanger:hover {
-  background: #ff5c5c;
+  background: #ef4444;
   color: white;
 }
 
@@ -185,21 +191,23 @@
   font-size: 16px;
   cursor: pointer;
   padding: 4px;
-  transition: transform 0.15s ease;
+  color: #cbd5e1;
+  transition: transform 0.15s ease, color 0.2s ease;
 }
 
 .cq-iconbtn:hover {
   transform: scale(1.15);
+  color: #4f8cff;
 }
 
 /* ================= MATCHING ================= */
 
 .cq-pair {
-  background: #f9fafc;
+  background-color: #1e293b;  /* slate-800 jelleg */
   border-radius: 10px;
   padding: 14px;
   margin-bottom: 16px;
-  border: 1px solid #eef1f4;
+  border: 1px solid #334155;
 }
 
 /* ================= FOOTER ================= */
@@ -222,10 +230,7 @@
     padding-left: 0;
   }
 
-  .cq-input {
-    width: 100%;
-  }
-
+  .cq-input,
   .cq-select {
     width: 100%;
   }

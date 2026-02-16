@@ -60,3 +60,38 @@
   box-shadow: none;
 }
 
+/* ========================= */
+/* 📱 Mobile responsive */
+/* ========================= */
+@media (max-width: 768px) {
+  .helpLayout {
+    padding: 1.2rem;
+    gap: 1.2rem;
+  }
+
+  .helpTitle {
+    font-size: 1.8rem;
+  }
+
+  .helpCard {
+    padding: 1.2rem;
+    border-radius: 12px;
+  }
+
+  .helpCard h2 {
+    font-size: 1.2rem;
+  }
+
+  .helpCard p {
+    font-size: 0.95rem;
+  }
+
+  .helpCard a {
+    display: block;
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 8px;
+    font-size: 14px;
+  }
+}

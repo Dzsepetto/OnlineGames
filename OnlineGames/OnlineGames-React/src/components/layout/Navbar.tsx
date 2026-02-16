@@ -1,12 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import "../../styles/layout.css";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { i18n, t } = useTranslation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -22,14 +24,29 @@ const Navbar = () => {
     <nav className="navbar">
       {/* LEFT */}
       <div className="nav-left">
-        <NavLink to="/">{t("nav.home")}</NavLink>
-        <NavLink to="/quizzes">{t("nav.quizzes")}</NavLink>
-        <NavLink to="/help">{t("nav.help")}</NavLink>
+        {/* 🍔 Hamburger button (mobile only) */}
+        <button
+          className="hamburger"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          ☰
+        </button>
+
+        <div className={`nav-links ${menuOpen ? "open" : ""}`}>
+          <NavLink to="/" onClick={() => setMenuOpen(false)}>
+            {t("nav.home")}
+          </NavLink>
+          <NavLink to="/quizzes" onClick={() => setMenuOpen(false)}>
+            {t("nav.quizzes")}
+          </NavLink>
+          <NavLink to="/help" onClick={() => setMenuOpen(false)}>
+            {t("nav.help")}
+          </NavLink>
+        </div>
       </div>
 
       {/* RIGHT */}
       <div className="nav-right">
-        {/* 🌍 Language switcher */}
         <div className="lang-switcher">
           <button
             className={i18n.language === "en" ? "active" : ""}
@@ -45,7 +62,6 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* 👤 Auth */}
         {user ? (
           <div className="auth-info">
             <span>

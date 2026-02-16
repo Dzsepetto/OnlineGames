@@ -4,11 +4,13 @@ import { getQuizzes, deleteQuiz } from "../../services/quizService";
 import type { Quiz } from "../../types/quiz";
 import QuizCard from "../../components/quiz/QuizCard";
 import { useAuth } from "../../auth/AuthContext";
+import { useTranslation } from "react-i18next";
 import "../../styles/Quiz/QuizList.css";
 
 const QuizList = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -41,7 +43,7 @@ const QuizList = () => {
     if (!quiz.id) return;
 
     const ok = window.confirm(
-      `Biztos törlöd a kvízt?\n\n${quiz.title}`
+      `${t("quizList.deleteConfirm")}\n\n${quiz.title}`
     );
     if (!ok) return;
 
@@ -52,7 +54,7 @@ const QuizList = () => {
         prev.filter((q) => q.id !== quiz.id)
       );
     } catch (e: any) {
-      alert(e?.message ?? "Törlés sikertelen");
+      alert(e?.message ?? t("quizList.deleteError"));
     } finally {
       setDeletingId(null);
     }
@@ -70,7 +72,9 @@ const QuizList = () => {
               setSelectedLanguage(e.target.value)
             }
           >
-            <option value="all">🌍 All</option>
+            <option value="all">
+              🌍 {t("quizList.all")}
+            </option>
             <option value="hu">🇭🇺 Magyar</option>
             <option value="en">🇬🇧 English</option>
           </select>
@@ -78,7 +82,7 @@ const QuizList = () => {
 
         <div className="quizlist-center">
           <h2 className="quizlist-title">
-            Select a Quiz
+            {t("quizList.title")}
           </h2>
         </div>
 
@@ -88,7 +92,7 @@ const QuizList = () => {
               to="/create-quiz"
               className="create-quiz-btn"
             >
-              + Create Quiz
+              + {t("quizList.create")}
             </Link>
           )}
         </div>
@@ -100,21 +104,6 @@ const QuizList = () => {
           const isOwner =
             user &&
             quiz.created_by?.toString() === user.id;
-
-          // DEBUG LOG
-          console.log("---- QUIZ DEBUG ----");
-          console.log("quiz.id:", quiz.id);
-          console.log(
-            "quiz.created_by:",
-            quiz.created_by,
-            typeof quiz.created_by
-          );
-          console.log(
-            "user.id:",
-            user?.id,
-            typeof user?.id
-          );
-          console.log("IS OWNER:", isOwner);
 
           return (
             <div
@@ -163,14 +152,15 @@ const QuizList = () => {
 
               {quiz.creator_name && (
                 <span className="creator-name">
-                  Created by: {quiz.creator_name}
+                  {t("quizList.createdBy")}:{" "}
+                  {quiz.creator_name}
                 </span>
               )}
             </div>
           );
         })
       ) : (
-        <p>No quizzes available.</p>
+        <p>{t("quizList.noQuizzes")}</p>
       )}
     </div>
   );

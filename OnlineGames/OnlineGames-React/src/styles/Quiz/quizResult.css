@@ -71,3 +71,34 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ========================= */
+/* Mobile responsive */
+/* ========================= */
+@media (max-width: 768px) {
+  .quiz-result-container {
+    padding: 20px;
+  }
+
+  .quiz-result-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 24px;
+    border-radius: 16px;
+  }
+
+  .score-display {
+    font-size: 36px;
+  }
+
+  .percentage {
+    font-size: 16px;
+  }
+
+  .back-button {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+  }
+}

@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { API_BASE } from "../config/api";
 import { motion } from "framer-motion";
-import "../styles/login.css"
+import { useTranslation } from "react-i18next";
+import "../styles/login.css";
 
 export default function Login() {
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <div className="login-page">
@@ -19,9 +21,9 @@ export default function Login() {
       >
         <div className="login-card">
           <div className="login-header">
-            <h1 className="login-title">Welcome Back</h1>
+            <h1 className="login-title">{t("login.title")}</h1>
             <p className="login-subtitle">
-              Sign in to continue to your dashboard
+              {t("login.subtitle")}
             </p>
           </div>
 
@@ -32,10 +34,7 @@ export default function Login() {
                 shape="pill"
                 size="large"
                 onSuccess={async (cred) => {
-                  if (!cred.credential) {
-                    console.log("No credential");
-                    return;
-                  }
+                  if (!cred.credential) return;
 
                   const res = await fetch(`${API_BASE}/auth/google.php`, {
                     method: "POST",
@@ -55,12 +54,12 @@ export default function Login() {
           </div>
 
           <div className="login-terms">
-            By signing in, you agree to our Terms & Privacy Policy
+            {t("login.terms")}
           </div>
         </div>
 
         <div className="login-footer">
-          © {new Date().getFullYear()} Your App Name
+          © {new Date().getFullYear()} {t("login.footer")}
         </div>
       </motion.div>
     </div>

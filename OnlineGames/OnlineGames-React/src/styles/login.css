@@ -4,7 +4,6 @@
   justify-content: center;   /* vízszintesen középen */
   align-items: flex-start;   /* felül kezdődjön */
   padding: 6rem 1rem 2rem 1rem;
-  background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
 }
 
 .login-container {

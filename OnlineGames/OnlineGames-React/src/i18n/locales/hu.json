@@ -23,5 +23,21 @@
     "help" : "Segítség", 
     "login" : "Bejelentkezés",
     "logout" : "Kijelentkezés"
-  }
+  },
+  "login": {
+  "title": "Üdv Újra!",
+  "subtitle": "Jelentkezz be a folytatáshoz",
+  "terms": "Bejelentkezéssel elfogadod a Felhasználási feltételeket és az Adatvédelmi irányelveket",
+  "footer": "Mini Games"
+},"quizList": {
+  "title": "Válassz egy kvízt",
+  "all": "Összes",
+  "create": "Kvíz létrehozása",
+  "noQuizzes": "Nincs elérhető kvíz.",
+  "createdBy": "Készítette",
+  "deleteConfirm": "Biztos törlöd a kvízt?",
+  "deleteError": "A törlés sikertelen"
+}
+
+
 }

@@ -23,5 +23,22 @@
     "help" : "Help", 
     "login" : "Login",
     "logout" : "Logout"
-  }
+  },
+  "login": {
+  "title": "Welcome Back",
+  "subtitle": "Sign in to continue to your dashboard",
+  "terms": "By signing in, you agree to our Terms & Privacy Policy",
+  "footer": "Mini Games"
+},
+"quizList": {
+  "title": "Select a Quiz",
+  "all": "All",
+  "create": "Create Quiz",
+  "noQuizzes": "No quizzes available.",
+  "createdBy": "Created by",
+  "deleteConfirm": "Are you sure you want to delete this quiz?",
+  "deleteError": "Delete failed"
+}
+
+
 }

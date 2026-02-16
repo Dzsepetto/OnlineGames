@@ -42,7 +42,7 @@
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 8px;
-  background-color: #fff;
+  background-color: #1e293b;  /* slate-800 jelleg */
 }
 
 .cq-row {
@@ -73,7 +73,7 @@
 
 .cq-body--matching {
   margin-left: 25px;
-  background: #f8f9fa;
+  background-color: #1e293b;  /* slate-800 jelleg */  
   padding: 15px;
   border-radius: 5px;
 }
