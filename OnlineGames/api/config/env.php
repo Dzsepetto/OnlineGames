@@ -1,49 +1,47 @@
 <?php
-// ========================================
-// Környezeti változó olvasó (PHP 7 safe)
-// ========================================
-error_log("ENV DEBUG HTTP_HOST = " . ($_SERVER['HTTP_HOST'] ?? 'N/A'));
 
-function env($key, $default = null) {
+$envPath = dirname(__DIR__) . '/.env';
+
+if (file_exists($envPath)) {
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+
+        if ($line === '' || str_starts_with($line, '#')) {
+            continue;
+        }
+
+        $pos = strpos($line, '=');
+        if ($pos === false) continue;
+
+        $key = trim(substr($line, 0, $pos));
+        $value = trim(substr($line, $pos + 1));
+
+        if (($value[0] ?? '') === '"' && substr($value, -1) === '"') {
+            $value = substr($value, 1, -1);
+        }
+        if (($value[0] ?? '') === "'" && substr($value, -1) === "'") {
+            $value = substr($value, 1, -1);
+        }
+
+        if (getenv($key) === false) {
+            putenv("$key=$value");
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+        }
+    }
+}
+
+function env(string $key, $default = null) {
     $value = getenv($key);
-    return ($value !== false) ? $value : $default;
+    return ($value !== false && $value !== '') ? $value : $default;
 }
 
-// ========================================
-// Környezet felismerése (local vs prod)
-// ========================================
-$host = $_SERVER['HTTP_HOST'] ?? '';
+define('ENV', env('APP_ENV', 'production'));
 
-$IS_LOCAL = (
-    strpos($host, 'localhost') !== false ||
-    strpos($host, '127.0.0.1') !== false
-);
+define('DB_HOST', env('DB_HOST', '127.0.0.1'));
+define('DB_NAME', env('DB_NAME', ''));
+define('DB_USER', env('DB_USER', ''));
+define('DB_PASS', env('DB_PASS', ''));
 
-
-if ($IS_LOCAL) {
-    // ===== LOCAL FEJLESZTŐI KÖRNYEZET =====
-    define('ENV', 'local');
-
-    // Local adatbázis
-    define('DB_HOST', '127.0.0.1');
-    define('DB_NAME', 'dzsepetto_local');
-    define('DB_USER', 'root');
-    define('DB_PASS', '');
-
-    // HTTP → nincs secure cookie
-    define('COOKIE_SECURE', false);
-
-} else {
-    // ===== ÉLES KÖRNYEZET =====
-    define('ENV', 'prod');
-
-    // Prod adatbázis környezeti változókból
-    define('DB_HOST', env('DB_HOST'));
-    define('DB_NAME', env('DB_NAME'));
-    define('DB_USER', env('DB_USER'));
-    define('DB_PASS', env('DB_PASS'));
-
-    // HTTPS → kötelező secure cookie
-    define('COOKIE_SECURE', true);
-}
-
+define('COOKIE_SECURE', ENV !== 'local');
