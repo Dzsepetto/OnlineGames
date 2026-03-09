@@ -4,6 +4,7 @@ import { getQuizMeta, getQuizResults } from "../../services/quizService";
 import { useAuth } from "../../auth/AuthContext";
 import QuizCountdownModal from "./QuizCountdownModal";
 
+
 type QuizMeta = {
   id: string;
   title: string;

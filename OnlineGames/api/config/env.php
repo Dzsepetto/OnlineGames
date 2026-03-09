@@ -4,12 +4,10 @@ $envPath = dirname(__DIR__) . '/.env';
 
 if (file_exists($envPath)) {
     $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
     foreach ($lines as $line) {
         $line = trim($line);
-
-        if ($line === '' || str_starts_with($line, '#')) {
-            continue;
-        }
+        if ($line === '' || str_starts_with($line, '#')) continue;
 
         $pos = strpos($line, '=');
         if ($pos === false) continue;
@@ -24,11 +22,9 @@ if (file_exists($envPath)) {
             $value = substr($value, 1, -1);
         }
 
-        if (getenv($key) === false) {
-            putenv("$key=$value");
-            $_ENV[$key] = $value;
-            $_SERVER[$key] = $value;
-        }
+        putenv("$key=$value");
+        $_ENV[$key] = $value;
+        $_SERVER[$key] = $value;
     }
 }
 
