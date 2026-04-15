@@ -5,7 +5,7 @@ import Footer from "./Footer";
 const Layout = () => (
   <>
     <Navbar />
-    <main style={{ padding: "2rem" }}>
+    <main style={{ padding: "2rem", display: "flex" }}>
       <Outlet />
     </main>
     <Footer />

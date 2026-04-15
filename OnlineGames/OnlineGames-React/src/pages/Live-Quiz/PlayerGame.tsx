@@ -4,6 +4,7 @@ import { API_BASE } from "../../config/api";
 import LobbyView from "./Components/LobbyView";
 import QuestionView from "./Components/QuestionView";
 import ResultView from "./Components/ResultView";
+import "../../styles/Live-Quiz/playerGame.css";
 
 type Player = {
   id: number;
@@ -73,17 +74,13 @@ export default function PlayerGame() {
 
   // 🎮 RENDER STATE ALAPJÁN
 
-  if (state === "lobby") {
-    return <LobbyView players={players} pin={pin!} />;
-  }
-
-  if (state === "playing") {
-    return <QuestionView question={question} onAnswer={handleAnswer} />;
-  }
-
-  if (state === "finished") {
-    return <ResultView players={players} />;
-  }
-
-  return <div>Unknown state...</div>;
+  return (
+  <div className="player-container">
+    {state === "lobby" && <LobbyView players={players} pin={pin!} />}
+    {state === "playing" && (
+      <QuestionView question={question} onAnswer={handleAnswer} />
+    )}
+    {state === "finished" && <ResultView players={players} />}
+  </div>
+);
 }

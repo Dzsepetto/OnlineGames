@@ -1,0 +1,31 @@
+.player-container {
+  flex:1;
+  width: 100%;
+  background: #111;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.player-lobby {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-list {
+  margin-top: 20px;
+}
+
+.player-results {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

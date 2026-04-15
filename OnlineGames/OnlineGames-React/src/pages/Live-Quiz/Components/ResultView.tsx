@@ -1,13 +1,13 @@
 export default function ResultView({ players }: any) {
   return (
-    <div style={{ textAlign: "center", marginTop: 50 }}>
-      <h1>Results</h1>
+    <div className="player-results">
+      <h1>🏆 Results</h1>
 
-      {players
+      {[...players]
         .sort((a: any, b: any) => b.score - a.score)
-        .map((p: any) => (
+        .map((p: any, i: number) => (
           <div key={p.id}>
-            {p.name} - {p.score}
+            {i + 1}. {p.name} - {p.score}
           </div>
         ))}
     </div>

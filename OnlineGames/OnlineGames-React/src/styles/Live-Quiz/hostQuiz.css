@@ -1,0 +1,102 @@
+.host-container {
+  flex:1;
+  background: #111;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+}
+.before-host{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+/* TOP BAR */
+.host-topbar {
+  display: flex;
+  justify-content: space-between; /* EZ A KULCS */
+  align-items: center;
+
+  padding: 20px;
+  width: 100%;
+}
+
+/* bal oldal */
+.exit-box button {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* jobb oldal */
+.pin-box {
+  background: white;
+  color: black;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+/* CENTER CONTENT */
+.lobby,
+.question-screen,
+.results {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+
+  text-align: center;
+}
+
+/* BIG PIN */
+.pin-big {
+  font-size: 4rem;
+  font-weight: bold;
+}
+
+/* QUESTION */
+.question-text {
+  font-size: 3rem;
+  margin-bottom: 40px;
+}
+
+/* ANSWERS */
+.answers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 80%;
+  max-width: 900px;
+}
+
+.answer-box {
+  padding: 40px;
+  border-radius: 20px;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+/* BUTTONS */
+.start-btn,
+.next-btn {
+  margin-top: 30px;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+/* RESULTS */
+.result-row {
+  font-size: 1.5rem;
+  margin: 10px;
+}

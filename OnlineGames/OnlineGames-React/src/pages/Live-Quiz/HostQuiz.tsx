@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getQuizMeta } from "../../services/quizService";
 import { API_BASE } from "../../config/api";
 import type { QuizMeta } from "../../types/quiz";
+import "../../styles/Live-Quiz/hostQuiz.css";
 
 type Player = {
   id: number;
@@ -18,190 +19,162 @@ type Question = {
 };
 
 export default function HostQuiz() {
+  const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
+
+  const colors = ["#e21b3c", "#1368ce", "#d89e00", "#26890c"];
 
   const [meta, setMeta] = useState<QuizMeta | null>(null);
   const [gamePin, setGamePin] = useState<string | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [state, setState] = useState<string>("lobby");
-  const [questionIndex, setQuestionIndex] = useState<number>(0);
   const [question, setQuestion] = useState<Question | null>(null);
 
-  // ❗ slug guard
-  if (!slug) {
-    return <div>Invalid quiz</div>;
-  }
+  if (!slug) return <div>Invalid quiz</div>;
 
-  // 🔥 QUIZ META LOAD
+  // META
   useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getQuizMeta(slug);
-        setMeta(data);
-      } catch (err) {
-        console.error("Meta load error:", err);
-      }
-    };
-
-    load();
+    getQuizMeta(slug).then(setMeta).catch(console.error);
   }, [slug]);
 
-  // 🎮 CREATE GAME
+  // CREATE GAME
   const handleCreateGame = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/live-quiz/create-game.php`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          quiz_id: slug,
-        }),
-      });
+    const res = await fetch(`${API_BASE}/live-quiz/create-game.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ quiz_id: slug }),
+    });
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("API error:", text);
-        return;
-      }
-
-      const data = await res.json();
-
-      if (!data.ok) {
-        console.error("Backend error:", data);
-        return;
-      }
-
-      setGamePin(data.pin);
-    } catch (err) {
-      console.error(err);
-    }
+    const data = await res.json();
+    setGamePin(data.pin);
   };
 
-  // 🔁 POLLING
+  // POLLING
   useEffect(() => {
     if (!gamePin) return;
 
     const interval = setInterval(async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/live-quiz/get-game-state.php?pin=${gamePin}`
-        );
+      const res = await fetch(
+        `${API_BASE}/live-quiz/get-game-state.php?pin=${gamePin}`
+      );
+      const data = await res.json();
 
-        const data = await res.json();
-
-        setPlayers(data.players || []);
-        setState(data.game?.state || "lobby");
-        setQuestionIndex(data.game?.current_question_index || 0);
-        setQuestion(data.question || null);
-      } catch (err) {
-        console.error(err);
-      }
+      setPlayers(data.players || []);
+      setState(data.game?.state || "lobby");
+      setQuestion(data.question || null);
     }, 2000);
 
     return () => clearInterval(interval);
   }, [gamePin]);
 
-  // ▶️ START GAME
+  const handleExit = () => {
+  navigate(`/quiz/${slug}`);
+};
+
+  // START
   const handleStartGame = async () => {
-    try {
-      await fetch(`${API_BASE}/live-quiz/start-game.php`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ pin: gamePin }),
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    await fetch(`${API_BASE}/live-quiz/start-game.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ pin: gamePin }),
+    });
   };
 
-  // ⏭ NEXT QUESTION
+  // NEXT
   const handleNextQuestion = async () => {
-    try {
-      await fetch(`${API_BASE}/live-quiz/next-question.php`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ pin: gamePin }),
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    await fetch(`${API_BASE}/live-quiz/next-question.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ pin: gamePin }),
+    });
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: 50 }}>
-      <h1>Host Quiz</h1>
+    <div className="host-container">
 
-      {/* 🔥 QUIZ INFO */}
-      <p style={{ opacity: 0.7 }}>
-        Hosting quiz: <b>{meta?.title ?? "Loading..."}</b>
-      </p>
+      {/* TOP BAR */}
+        {state !== "lobby" && gamePin && (
+          <div className="host-topbar">
+            <div className="exit-box">
+              <button onClick={handleExit}>Exit</button>
+            </div>
 
-      {/* 🎮 CREATE */}
-      {!gamePin ? (
-        <button onClick={handleCreateGame}>
-          Start Quiz
-        </button>
-      ) : (
-        <div>
-          <h2>Game PIN:</h2>
-          <h1 style={{ fontSize: "3rem" }}>{gamePin}</h1>
+            <div className="pin-box">PIN: {gamePin}</div>
+          </div>
+        )}
 
-          {/* 👥 PLAYERS */}
-          <h3>Players:</h3>
+      {/* NO GAME */}
+      {!gamePin && (
+        <div className="before-host">
+          <h1>{meta?.title}</h1>
+          <button className="start-btn" onClick={handleCreateGame}>
+          Start Host
+          </button>
+        </div>
+      )}
+
+      {/* LOBBY */}
+      {gamePin && state === "lobby" && (
+        <div className="lobby">
+          <h1>{meta?.title}</h1>
+          <h2>Pin:</h2>
+          <div className="pin-big">{gamePin}</div>
+
+          <h2>Players</h2>
           {players.length === 0 && <p>No players yet...</p>}
 
           {players.map((p) => (
             <div key={p.id}>{p.name}</div>
           ))}
 
-          {/* 🎯 STATE */}
-          <p>State: {state}</p>
-          <p>Question: {questionIndex + 1}</p>
+          <button className="start-btn" onClick={handleStartGame}>
+            Start Game
+          </button>
+        </div>
+      )}
 
-          {/* ▶️ START */}
-          {state === "lobby" && (
-            <button onClick={handleStartGame}>
-              Start Game
-            </button>
-          )}
+      {/* PLAYING */}
+      {state === "playing" && question && (
+        <div className="question-screen">
 
-          {/* ❓ QUESTION DISPLAY (Kahoot host view) */}
-          {state === "playing" && question && (
-            <div style={{ marginTop: 40 }}>
-              <h2>{question.text}</h2>
+          <h1 className="question-text">{question.text}</h1>
 
-              <div style={{ marginTop: 20 }}>
-                {question.answers?.map((a) => (
-                  <div
-                    key={a.id}
-                    style={{
-                      margin: 10,
-                      padding: 10,
-                      border: "1px solid #ccc",
-                      borderRadius: 10,
-                    }}
-                  >
-                    {a.text}
-                  </div>
-                ))}
+          <div className="answers-grid">
+            {question.answers?.map((a, index) => (
+              <div
+                key={a.id}
+                className="answer-box"
+                style={{ backgroundColor: colors[index % colors.length] }}
+              >
+                {a.text}
               </div>
-            </div>
-          )}
+            ))}
+          </div>
 
-          {/* ⏭ NEXT */}
-          {state === "playing" && (
-            <button
-              onClick={handleNextQuestion}
-              style={{ marginTop: 30 }}
-            >
-              Next Question →
-            </button>
-          )}
+          <button className="next-btn" onClick={handleNextQuestion}>
+            Next →
+          </button>
+        </div>
+      )}
+
+      {/* RESULTS */}
+      {state === "finished" && (
+        <div className="results">
+          <h1>🏆 Results</h1>
+
+          {[...players]
+            .sort((a, b) => b.score - a.score)
+            .map((p, i) => (
+              <div key={p.id} className="result-row">
+                {i + 1}. {p.name} - {p.score}
+              </div>
+            ))}
         </div>
       )}
     </div>
