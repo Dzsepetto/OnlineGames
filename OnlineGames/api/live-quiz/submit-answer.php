@@ -2,7 +2,8 @@
 require __DIR__ . "/../bootstrap.php";
 require __DIR__ . "/../db.php";
 
-// 🔥 JSON read
+// ========================================
+// INPUT
 $raw = file_get_contents("php://input");
 $data = json_decode($raw, true);
 
@@ -18,10 +19,11 @@ if (
 }
 
 $playerId = (int)$data["player_id"];
-$answerId = (int)$data["answer_id"];
+$answerId = $data["answer_id"];
 $pin = (string)$data["pin"];
 
-// 🔥 question lekérés az answer alapján
+// ========================================
+// ANSWER → QUESTION + CORRECTNESS
 $stmt = $pdo->prepare("
     SELECT question_id, is_correct 
     FROM answer_option 
@@ -39,20 +41,50 @@ if (!$row) {
 $questionId = $row["question_id"];
 $isCorrect = (int)$row["is_correct"];
 
-// 🔥 SAVE
-$pdo->prepare("
-    INSERT INTO game_answers 
-    (game_id, player_id, question_id, answer_id, is_correct)
-    VALUES (?, ?, ?, ?, ?)
-")->execute([$pin, $playerId, $questionId, $answerId, $isCorrect]);
+// ========================================
+// DUPLICATE CHECK
+$stmt = $pdo->prepare("
+    SELECT id FROM game_answers
+    WHERE game_id = ? AND player_id = ? AND question_id = ?
+");
+$stmt->execute([$pin, $playerId, $questionId]);
 
-// 🔥 SCORE
-if ($isCorrect) {
-    $pdo->prepare("
-        UPDATE game_players 
-        SET score = score + 100
-        WHERE id = ?
-    ")->execute([$playerId]);
+if ($stmt->fetch()) {
+    echo json_encode([
+        "ok" => true,
+        "duplicate" => true
+    ]);
+    exit;
 }
 
-echo json_encode(["ok" => true]);
+// ========================================
+// 🔥 GET QUESTION START TIME
+$stmt = $pdo->prepare("
+    SELECT question_started_at 
+    FROM game_sessions 
+    WHERE id = ?
+");
+$stmt->execute([$pin]);
+$game = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$startedAt = $game["question_started_at"] ?? null;
+
+// ========================================
+// SAVE
+$pdo->prepare("
+    INSERT INTO game_answers 
+    (game_id, player_id, question_id, answer_id, is_correct, started_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+")->execute([
+    $pin,
+    $playerId,
+    $questionId,
+    $answerId,
+    $isCorrect,
+    $startedAt
+]);
+
+echo json_encode([
+    "ok" => true,
+    "correct" => (bool)$isCorrect
+]);

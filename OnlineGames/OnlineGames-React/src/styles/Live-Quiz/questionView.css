@@ -38,3 +38,20 @@
   height: 100vh;
   font-size: 1.5rem;
 }
+
+/* TIMER */
+.question-timer {
+  position: absolute;
+  top: 50px;
+  left: 30px;
+
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px 16px;
+  border-radius: 10px;
+
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+
+  z-index: 10;
+}

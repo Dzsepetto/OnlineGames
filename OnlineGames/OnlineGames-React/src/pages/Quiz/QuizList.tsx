@@ -61,7 +61,7 @@ const QuizList = () => {
   };
 
   return (
-    <div>
+    <div className="quizlist-container">
       {/* ================= HEADER ================= */}
       <div className="quizlist-header">
         <div className="quizlist-left">

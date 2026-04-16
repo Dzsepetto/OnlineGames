@@ -1,0 +1,100 @@
+.join-container {
+flex:1;
+  background: #111;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.join-card {
+  background: #1a1a1a;
+  padding: 40px;
+  border-radius: 20px;
+
+  width: 100%;
+  max-width: 400px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.join-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* inputs */
+.join-input {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+
+  font-size: 1rem;
+  background: #2a2a2a;
+  color: white;
+
+  transition: all 0.2s ease;
+}
+
+.join-input::placeholder {
+  color: #aaa;
+}
+
+.join-input:focus {
+  background: #333;
+}
+
+/* button */
+.join-button {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+
+  font-size: 1.1rem;
+  font-weight: bold;
+
+  background: #2563eb;
+  color: white;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.join-button:hover {
+  background: #1e40af;
+}
+
+.join-button:active {
+  transform: scale(0.98);
+}
+
+/* 📱 MOBILE */
+@media (max-width: 500px) {
+  .join-card {
+    padding: 25px;
+    gap: 15px;
+  }
+
+  .join-title {
+    font-size: 1.6rem;
+  }
+
+  .join-input {
+    font-size: 0.95rem;
+    padding: 12px;
+  }
+
+  .join-button {
+    font-size: 1rem;
+    padding: 12px;
+  }
+}

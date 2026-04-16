@@ -29,15 +29,30 @@ export default function HostQuiz() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [state, setState] = useState<string>("lobby");
   const [question, setQuestion] = useState<Question | null>(null);
+  const [answersCount, setAnswersCount] = useState(0);
 
   if (!slug) return <div>Invalid quiz</div>;
 
+  // =========================
+  // 🔥 LOAD PIN FROM STORAGE
+  // =========================
+  useEffect(() => {
+    const savedPin = localStorage.getItem(`host_pin_${slug}`);
+    if (savedPin) {
+      setGamePin(savedPin);
+    }
+  }, [slug]);
+
+  // =========================
   // META
+  // =========================
   useEffect(() => {
     getQuizMeta(slug).then(setMeta).catch(console.error);
   }, [slug]);
 
+  // =========================
   // CREATE GAME
+  // =========================
   const handleCreateGame = async () => {
     const res = await fetch(`${API_BASE}/live-quiz/create-game.php`, {
       method: "POST",
@@ -48,32 +63,54 @@ export default function HostQuiz() {
     });
 
     const data = await res.json();
+
     setGamePin(data.pin);
+
+    // 🔥 SAVE
+    localStorage.setItem(`host_pin_${slug}`, data.pin);
   };
 
+  // =========================
   // POLLING
+  // =========================
   useEffect(() => {
     if (!gamePin) return;
 
     const interval = setInterval(async () => {
-      const res = await fetch(
-        `${API_BASE}/live-quiz/get-game-state.php?pin=${gamePin}`
-      );
-      const data = await res.json();
+      try {
+        const res = await fetch(
+          `${API_BASE}/live-quiz/get-game-state.php?pin=${gamePin}`
+        );
 
-      setPlayers(data.players || []);
-      setState(data.game?.state || "lobby");
-      setQuestion(data.question || null);
+        // 🔥 ha game törölve / invalid → reset
+        if (!res.ok) {
+          localStorage.removeItem(`host_pin_${slug}`);
+          setGamePin(null);
+          return;
+        }
+
+        const data = await res.json();
+
+        setPlayers(data.players || []);
+        setState(data.game?.state || "lobby");
+        setQuestion(data.question || null);
+        setAnswersCount(data.answers_count || 0);
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [gamePin]);
+  }, [gamePin, slug]);
 
   const handleExit = () => {
-  navigate(`/quiz/${slug}`);
-};
+    localStorage.removeItem(`host_pin_${slug}`);
+    navigate(`/quiz/${slug}`);
+  };
 
+  // =========================
   // START
+  // =========================
   const handleStartGame = async () => {
     await fetch(`${API_BASE}/live-quiz/start-game.php`, {
       method: "POST",
@@ -84,7 +121,9 @@ export default function HostQuiz() {
     });
   };
 
+  // =========================
   // NEXT
+  // =========================
   const handleNextQuestion = async () => {
     await fetch(`${API_BASE}/live-quiz/next-question.php`, {
       method: "POST",
@@ -99,29 +138,36 @@ export default function HostQuiz() {
     <div className="host-container">
 
       {/* TOP BAR */}
-        {state !== "lobby" && gamePin && (
-          <div className="host-topbar">
-            <div className="exit-box">
-              <button onClick={handleExit}>Exit</button>
-            </div>
-
-            <div className="pin-box">PIN: {gamePin}</div>
+      {state !== "lobby" && gamePin && (
+        <div className="host-topbar">
+          <div className="exit-box">
+            <button onClick={handleExit}>Exit</button>
           </div>
-        )}
+
+          <div className="pin-box">PIN: {gamePin}</div>
+        </div>
+      )}
 
       {/* NO GAME */}
       {!gamePin && (
         <div className="before-host">
           <h1>{meta?.title}</h1>
           <button className="start-btn" onClick={handleCreateGame}>
-          Start Host
+            Start Host
           </button>
         </div>
       )}
 
       {/* LOBBY */}
       {gamePin && state === "lobby" && (
+        
         <div className="lobby">
+                  <div className="host-topbar">
+
+          <div className="exit-box">
+            <button onClick={handleExit}>Exit</button>
+          </div>
+          </div>
           <h1>{meta?.title}</h1>
           <h2>Pin:</h2>
           <div className="pin-big">{gamePin}</div>
@@ -145,21 +191,38 @@ export default function HostQuiz() {
 
           <h1 className="question-text">{question.text}</h1>
 
+          {/* ANSWER PROGRESS */}
+          <div style={{ marginBottom: 20, fontSize: "1.2rem" }}>
+            Answers: {answersCount} / {players.length}
+          </div>
+
           <div className="answers-grid">
             {question.answers?.map((a, index) => (
               <div
                 key={a.id}
                 className="answer-box"
-                style={{ backgroundColor: colors[index % colors.length] }}
+                style={{
+                  backgroundColor: colors[index % colors.length],
+                }}
               >
                 {a.text}
               </div>
             ))}
           </div>
 
-          <button className="next-btn" onClick={handleNextQuestion}>
-            Next →
-          </button>
+          {/* AUTO NEXT */}
+          {answersCount === players.length && players.length > 0 && (
+            <button className="next-btn" onClick={handleNextQuestion}>
+              Everyone answered → Next
+            </button>
+          )}
+
+          {/* MANUAL NEXT */}
+          {answersCount !== players.length && (
+            <button className="next-btn" onClick={handleNextQuestion}>
+              Next →
+            </button>
+          )}
         </div>
       )}
 

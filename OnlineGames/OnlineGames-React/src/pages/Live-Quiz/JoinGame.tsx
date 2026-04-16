@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE } from "../../config/api";
+import "../../styles/Live-Quiz/joinGame.css"
 
 export default function JoinGame() {
   const [pin, setPin] = useState("");
@@ -24,7 +25,6 @@ export default function JoinGame() {
         return;
       }
 
-      // 👉 ide navigálunk
       navigate(`/play/${pin}/${data.player_id}`);
 
     } catch (err) {
@@ -32,23 +32,29 @@ export default function JoinGame() {
     }
   };
 
-  return (
-    <div style={{ textAlign: "center", marginTop: 50 }}>
-      <h1>Join Game</h1>
+ return (
+  <div className="join-container">
+    <div className="join-card">
+      <h1 className="join-title">Join Game</h1>
 
       <input
+        className="join-input"
         placeholder="Game PIN"
         value={pin}
         onChange={(e) => setPin(e.target.value)}
       />
 
       <input
+        className="join-input"
         placeholder="Your name"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
 
-      <button onClick={handleJoin}>Join</button>
+      <button className="join-button" onClick={handleJoin}>
+        Join
+      </button>
     </div>
-  );
+  </div>
+);
 }
