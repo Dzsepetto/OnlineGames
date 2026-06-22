@@ -163,3 +163,83 @@ footer {
   font-size: 0.875rem;
   color: #94a3b8;
 }
+
+
+.profile-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  transition: border-color 0.2s;
+}
+
+.profile-avatar:hover {
+  border-color: #007bff; /* Vagy a te elsődleges színed */
+}
+
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  background-color: white;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 10px 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-header {
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  color: #333;
+}
+
+.dropdown-email {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.profile-dropdown hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 8px 0;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  text-decoration: none;
+  color: #333;
+  text-align: left;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.logout-item {
+  color: #dc3545;
+}

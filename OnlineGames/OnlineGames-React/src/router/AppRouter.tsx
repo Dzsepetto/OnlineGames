@@ -12,6 +12,7 @@ import QuizInfo from "../features/quiz/components/QuizInfo";
 import HostQuiz from "../features/liveQuiz/pages/HostQuiz";
 import JoinGame from "../features/liveQuiz/pages/JoinGame";
 import PlayerGame from "../features/liveQuiz/pages/PlayerGame";
+import ProfilePage from "../pages/ProfilePage"
 
 export const router = createBrowserRouter([
   {
@@ -28,7 +29,8 @@ export const router = createBrowserRouter([
       { path: "/help", element: <Help /> },
       {path: "/host/:slug", element: <HostQuiz />},
       {path: "/join", element: <JoinGame />},
-      { path: "/play/:pin/:playerId", element: <PlayerGame /> }
+      { path: "/play/:pin/:playerId", element: <PlayerGame /> },
+      {path: "/profile", element: <ProfilePage/>}
     ],
   },
   { path: "*", element: <NotFound /> },

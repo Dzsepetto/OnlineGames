@@ -30,7 +30,7 @@ export default function Login() {
               theme="filled_black"
               shape="pill"
               size="large"
-              width="100%" /* Reszponzív szélesség az iframe-nek */
+              width="100%" 
               onSuccess={async (cred) => {
                 try {
                   if (!cred.credential) {
