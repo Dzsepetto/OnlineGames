@@ -28,12 +28,41 @@ flex:1;
   flex: 1;
   display: flex;
   justify-content: flex-end;
+  gap: 12px;
 }
 
 .quizlist-title {
   margin: 0;
   font-size: 2rem;
   font-weight: 600;
+}
+.join-live-btn {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.join-live-btn:hover {
+  background-color: #4f46e5;
+}
+
+.join-live-btn:active {
+  transform: scale(0.98);
+}
+
+.create-quiz-btn {
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 /* ================= LANGUAGE SELECT ================= */

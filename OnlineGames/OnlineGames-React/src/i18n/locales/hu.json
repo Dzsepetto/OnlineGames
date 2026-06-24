@@ -37,6 +37,7 @@
   "noQuizzes": "Nincs elérhető kvíz.",
   "createdBy": "Készítette",
   "deleteConfirm": "Biztos törlöd a kvízt?",
-  "deleteError": "A törlés sikertelen"
+  "deleteError": "A törlés sikertelen",
+  "joinLive" : "Live Quiz"
 }
 }

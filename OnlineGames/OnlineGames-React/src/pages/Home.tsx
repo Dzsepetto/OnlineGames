@@ -17,8 +17,8 @@ const Home = () => {
           {t("home.quizzes")}
         </Button>
 
-        <Button className="homeCard" onClick={() => navigate("join")}>
-          {t("home.liveQuiz")}
+        <Button className="homeCard disabled">
+          {t("home.comingSoon")}
         </Button>
 
         <Button className="homeCard disabled">

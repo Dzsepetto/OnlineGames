@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { getQuizzes, deleteQuiz } from "../services/quizService";
+import { Link } from "react-router-dom";
+import { getQuizzes } from "../services/quizService";
 import QuizCard from "../components/QuizCard";
 import { useAuth } from "../../../auth/AuthContext";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import "../styles/QuizList.css";
 
 import type { Quiz } from "../types/quiz";
-
 
 const QuizList = () => {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ const QuizList = () => {
   const { t } = useTranslation();
 
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
 
   const load = async () => {
@@ -41,27 +40,6 @@ const QuizList = () => {
             selectedLanguage.toLowerCase()
         );
 
-  const onDelete = async (quiz: Quiz) => {
-    if (!quiz.id) return;
-
-    const ok = window.confirm(
-      `${t("quizList.deleteConfirm")}\n\n${quiz.title}`
-    );
-    if (!ok) return;
-
-    try {
-      setDeletingId(quiz.id);
-      await deleteQuiz(quiz.id);
-      setQuizzes((prev) =>
-        prev.filter((q) => q.id !== quiz.id)
-      );
-    } catch (e: any) {
-      alert(e?.message ?? t("quizList.deleteError"));
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   return (
     <div className="quizlist-container">
       {/* ================= HEADER ================= */}
@@ -70,9 +48,7 @@ const QuizList = () => {
           <select
             className="quiz-language-select"
             value={selectedLanguage}
-            onChange={(e) =>
-              setSelectedLanguage(e.target.value)
-            }
+            onChange={(e) => setSelectedLanguage(e.target.value)}
           >
             <option value="all">
               🌍 {t("quizList.all")}
@@ -89,11 +65,12 @@ const QuizList = () => {
         </div>
 
         <div className="quizlist-right">
+          <button  className="join-live-btn" onClick={() => navigate("/join")} >
+              ⚡ {t("quizList.joinLive") || "Join Live Quiz"}
+          </button>
+
           {user && (
-            <Link
-              to="/create-quiz"
-              className="create-quiz-btn"
-            >
+            <Link to="/create-quiz" className="create-quiz-btn">
               + {t("quizList.create")}
             </Link>
           )}
@@ -102,65 +79,19 @@ const QuizList = () => {
 
       {/* ================= QUIZ LIST ================= */}
       {filteredQuizzes.length > 0 ? (
-        filteredQuizzes.map((quiz) => {
-          const isOwner =
-            user &&
-            quiz.created_by?.toString() === user.id;
-
-          return (
-            <div
-              key={quiz.id}
-              className="quiz-wrapper"
-            >
-              {isOwner && (
-                <div className="quiz-actions">
-                  <button
-                    className="settings-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(
-                        `/edit-quiz/${quiz.id}`
-                      );
-                    }}
-                  >
-                    ✏
-                  </button>
-
-                  <button
-                    className="delete-btn"
-                    disabled={
-                      deletingId === quiz.id
-                    }
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(quiz);
-                    }}
-                  >
-                    {deletingId === quiz.id
-                      ? "..."
-                      : "🗑"}
-                  </button>
-                </div>
-              )}
-
-              <div
-                onClick={() =>
-                  navigate(`/quiz/${quiz.slug}`)
-                }
-                style={{ cursor: "pointer" }}
-              >
-                <QuizCard quiz={quiz} />
-              </div>
+        <div className="profile-quiz-grid">
+          {filteredQuizzes.map((quiz) => (
+            <div key={quiz.id} className="quiz-wrapper">
+              <QuizCard quiz={quiz} />
 
               {quiz.creator_name && (
                 <span className="creator-name">
-                  {t("quizList.createdBy")}:{" "}
-                  {quiz.creator_name}
+                  {t("quizList.createdBy")}: {quiz.creator_name}
                 </span>
               )}
             </div>
-          );
-        })
+          ))}
+        </div>
       ) : (
         <p>{t("quizList.noQuizzes")}</p>
       )}

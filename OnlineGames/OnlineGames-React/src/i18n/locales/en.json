@@ -38,6 +38,10 @@
   "noQuizzes": "No quizzes available.",
   "createdBy": "Created by",
   "deleteConfirm": "Are you sure you want to delete this quiz?",
-  "deleteError": "Delete failed"
+  "deleteError": "Delete failed",
+  "joinLive" : "Join Live"
+},
+"profilePage":{
+  "title" : "Profile Page"
 }
 }

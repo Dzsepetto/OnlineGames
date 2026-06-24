@@ -5,6 +5,8 @@ require __DIR__ . "/db.php";
 $userId = isset($_SESSION["user_id"]) ? (string)$_SESSION["user_id"] : null;
 $userEmail = null;
 
+$mode = isset($_GET["mode"]) ? trim((string)$_GET["mode"]) : "";
+
 try {
     if ($userId) {
         $emailStmt = $pdo->prepare("
@@ -17,6 +19,36 @@ try {
 
         $userEmail = $emailStmt->fetchColumn();
         $userEmail = $userEmail ? strtolower(trim((string)$userEmail)) : null;
+    }
+
+    if ($mode === "mine") {
+        if (!$userId) {
+            json_error("Nincs bejelentkezve!", 401);
+        }
+
+        $sql = "
+            select 
+                q.id, 
+                q.slug, 
+                q.title, 
+                q.description,
+                q.created_by,
+                q.is_public,
+                q.language_code,
+                u.name as creator_name
+            from quiz q
+            left join users u on q.created_by = u.id
+            where q.created_by = ?
+            order by q.created_at desc
+        ";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$userId]);
+        $quizzes = $stmt->fetchAll();
+
+        json_success([
+            "quizzes" => $quizzes
+        ]);
     }
 
     if (!$userId || !$userEmail) {

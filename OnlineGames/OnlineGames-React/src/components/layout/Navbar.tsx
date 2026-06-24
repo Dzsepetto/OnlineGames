@@ -96,7 +96,7 @@ const Navbar = () => {
             {dropdownOpen && (
               <div className="profile-dropdown">
                 <div className="dropdown-header">
-                  <strong>{user.name || "User"}</strong>
+                  <strong>{user.nickname || user.name}</strong>
                   <span className="dropdown-email">{user.email}</span>
                 </div>
                 <NavLink 
@@ -104,7 +104,7 @@ const Navbar = () => {
                   className="dropdown-item"
                   onClick={() => setDropdownOpen(false)}
                 >
-                  {t("nav.settings", "Settings")}
+                  {t("nav.profile", "Profile")}
                 </NavLink>
                 <button className="dropdown-item logout-item" onClick={handleLogout}>
                   {t("nav.logout")}
