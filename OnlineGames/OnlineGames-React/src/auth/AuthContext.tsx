@@ -5,7 +5,9 @@ type User = {
   id: string;
   email: string;
   name: string;
+  nickname: string | null;
   profilePic?: string | null;
+  description: string | null;
 };
 
 type AuthContextType = {
@@ -40,6 +42,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         id: String(apiUser.id),
         email: String(apiUser.email),
         name: apiUser.name ?? "",
+        nickname: apiUser.nickname?? "",
+        description: apiUser.description ?? ""
       };
 
       setUser(normalizedUser);

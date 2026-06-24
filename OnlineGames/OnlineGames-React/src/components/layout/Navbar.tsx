@@ -86,7 +86,7 @@ const Navbar = () => {
               <img 
                 src={user.profilePic || "/prof_pic_placeholder.png"} 
                 alt="Profile" 
-                className="profile-avatar"
+                className="profile-icon"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = "/prof_pic_placeholder.png";
                 }}
@@ -99,7 +99,6 @@ const Navbar = () => {
                   <strong>{user.name || "User"}</strong>
                   <span className="dropdown-email">{user.email}</span>
                 </div>
-                <hr />
                 <NavLink 
                   to="/profile" 
                   className="dropdown-item"

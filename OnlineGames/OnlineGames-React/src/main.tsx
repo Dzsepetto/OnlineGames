@@ -11,6 +11,7 @@ import "./styles/globals.css";
 import "./styles/layout.css";
 import "./styles/buttons.css";
 import "./styles/cards.css";
+import "./styles/variables.css";
 
 import "./features/quiz/styles/quiz.css"
 import "./features/quiz/styles/createQuiz.css"

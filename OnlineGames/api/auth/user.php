@@ -14,11 +14,12 @@ try {
     $userId = (int)$_SESSION["user_id"];
 
     $stmt = $pdo->prepare("
-        select id, email, name
+        select id, email, name, nickname, description
         from users
         where id = ?
         limit 1
     ");
+
     $stmt->execute([$userId]);
     $user = $stmt->fetch();
 
@@ -35,6 +36,8 @@ try {
             "id" => (string)$user["id"],
             "email" => (string)$user["email"],
             "name" => (string)($user["name"] ?? ""),
+            "nickname" => (string)($user["nickname"] ?? ""),
+            "description" => (string)($user["description"] ?? "") 
         ]
     ]);
 

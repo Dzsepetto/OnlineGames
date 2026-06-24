@@ -1,0 +1,290 @@
+.profile-container {
+  width: 100%;      
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: sans-serif;
+  display: flex; 
+  flex-direction: column; 
+}
+
+.profile-header {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.header-banner-background {
+  height: 180px;
+  background: linear-gradient(45deg, #c3b4fc, #fbcfe8);
+  border-radius: 24px;
+}
+
+.profile-info-row {
+  display: flex;
+  gap: 30px;
+  padding: 0 40px;
+  margin-top: -60px; 
+  align-items: flex-start; 
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+}
+
+.profile-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 40px; 
+  border: 6px solid #fff;
+  object-fit: cover;
+}
+
+.profile-details-and-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  flex-grow: 1;
+  background: #0f172a; 
+  padding: 20px;
+  border-radius: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
+}
+
+.profile-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-name-tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 40px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 24px;
+  padding: 0 40px;
+  margin-bottom: 15px;
+  border-radius: 15px;
+  border: 2px solid var(--border-layer-1);
+}
+
+.tab-item {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding-bottom: 8px;
+}
+
+.tab-item.active {
+  background-color: blue;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.divider {
+  border: 0;
+  height: 1px;
+  background: #eaeaea;
+  margin: 0 40px 30px 40px;
+}
+
+
+
+.edit-icon-btn {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.85); 
+  border: 1px solid #ccc;
+  border-radius: 30%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: all 0.2s ease-in-out;
+  z-index: 10;
+  font-size: 14px;
+}
+
+.edit-icon-btn:hover {
+  background-color: #ffffff;
+  transform: scale(1.1);
+}
+
+.banner-edit {
+  top: 15px;
+  right: 15px;
+}
+
+.avatar-edit {
+  top: 5px;
+  right: 5px;
+}
+
+/* Settings Tartalom Elrendezés */
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: 600px; /* Hogy ne nyúljon el nagyon széles monitoron */
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.settings-subtitle {
+  color: #94a3b8; /* Lágy szürke */
+  font-size: 14px;
+  margin-top: -5px;
+  margin-bottom: 25px;
+}
+
+/* Form elemek */
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: var(--text-main); /* A világoskék vagy tiszta fehér */
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Inputok formázása - Behozzuk a Layer 2 színt ide */
+.form-group input,
+.form-group textarea {
+  background-color: var(--bg-layer-2); /* #334155 - Kiemelkedik a kártyából */
+  border: 1px solid var(--border-layer-2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #f8fafc;
+  font-size: 15px;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+}
+
+/* Fókusz állapot - Finom pasztell kék világítás */
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--pastel-blue);
+  box-shadow: 0 0 0 2px rgba(186, 230, 253, 0.15);
+}
+
+.form-help {
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* Mentés gomb - Pasztell kék gomb sötét szöveggel */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.btn-save {
+  background-color: blue; /* #bae6fd */
+  color: #0f172a; /* Sötét szöveg a jó kontrasztért */
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-save:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(186, 230, 253, 0.2);
+}
+
+/* Veszélyzóna kártya (Profil törlése) */
+.danger-zone {
+  margin-top: 20px;
+  border: 1px solid rgba(239, 68, 68, 0.2); /* Nagyon finom piros szegély */
+  background-color: rgba(239, 68, 68, 0.03); /* Minimális pirosas beütés */
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.danger-zone-header h4 {
+  color: #f87171; /* Pasztell/Lágy piros */
+  margin: 0 0 5px 0;
+  font-size: 16px;
+}
+
+.danger-zone-header p {
+  color: #94a3b8;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Törlés gomb */
+.btn-delete {
+  background-color: transparent;
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* Kis reszponzivitás a törlés zónának mobilra */
+@media (max-width: 480px) {
+  .danger-zone {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .btn-delete {
+    width: 100%;
+  }
+}

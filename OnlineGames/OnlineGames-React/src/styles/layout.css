@@ -179,7 +179,7 @@ footer {
   align-items: center;
 }
 
-.profile-avatar {
+.profile-icon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -188,18 +188,15 @@ footer {
   transition: border-color 0.2s;
 }
 
-.profile-avatar:hover {
-  border-color: #007bff; /* Vagy a te elsődleges színed */
-}
-
 .profile-dropdown {
   position: absolute;
   right: 0;
   top: 50px;
-  background-color: white;
+  background-color: var(--bg-layer-1);
   min-width: 200px;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
+  border: 2px solid var(--border-layer-1);
   padding: 10px 0;
   z-index: 1000;
   display: flex;
@@ -210,7 +207,7 @@ footer {
   padding: 8px 16px;
   display: flex;
   flex-direction: column;
-  color: #333;
+  color: #ffff;
 }
 
 .dropdown-email {
@@ -227,7 +224,7 @@ footer {
 .dropdown-item {
   padding: 10px 16px;
   text-decoration: none;
-  color: #333;
+  color: #eee;
   text-align: left;
   background: none;
   border: none;
@@ -237,7 +234,7 @@ footer {
 }
 
 .dropdown-item:hover {
-  background-color: #f5f5f5;
+  background-color: #666;
 }
 
 .logout-item {

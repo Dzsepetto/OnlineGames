@@ -1,0 +1,9 @@
+:root{
+  --bg-main: #0f172a;       /* Alap háttér */
+  --bg-layer-1: #1e293b;   /* Kártyák, profil doboz */
+  --bg-layer-2: #334155;   /* Modálok, felugrók, dropdownok */
+
+  /* Szegélyek */
+  --border-layer-1: rgba(255, 255, 255, 0.08);
+  --border-layer-2: rgba(255, 255, 255, 0.15);
+}
