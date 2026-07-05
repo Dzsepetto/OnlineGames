@@ -30,7 +30,8 @@ export const router = createBrowserRouter([
       {path: "/host/:slug", element: <HostQuiz />},
       {path: "/join", element: <JoinGame />},
       { path: "/play/:pin/:playerId", element: <PlayerGame /> },
-      {path: "/profile", element: <ProfilePage/>}
+      {path: "/profile", element: <ProfilePage/>},
+      {path: "/profile/:nickname", element: <ProfilePage/>}
     ],
   },
   { path: "*", element: <NotFound /> },

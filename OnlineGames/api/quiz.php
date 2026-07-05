@@ -10,9 +10,18 @@ if ($key === "") {
 
 try {
     $quizStmt = $pdo->prepare("
-        select id, slug, title, description, is_public, created_by
-        from quiz
-        where slug = ? or id = ?
+        select
+            q.id,
+            q.slug,
+            q.title,
+            q.description,
+            q.is_public,
+            q.created_by,
+            u.name as creator_name,
+            u.nickname as creator_nickname
+        from quiz q
+        left join users u on u.id = q.created_by
+        where q.slug = ? or q.id = ?
         limit 1
     ");
 

@@ -74,6 +74,24 @@
   color: #475569;
   letter-spacing: 0.025em;
 }
+.login-error {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(195, 55, 66, 0.12);
+  border: 1px solid rgba(195, 55, 66, 0.35);
+  color: #c33742;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.login-loading {
+  margin-top: 14px;
+  font-size: 14px;
+  opacity: 0.8;
+  text-align: center;
+}
 
 /* --- RESPONSIVE BREAKPOINTS --- */
 

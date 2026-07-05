@@ -1,44 +1,32 @@
 <?php
 require __DIR__ . "/../bootstrap.php";
-require __DIR__ . "/../db.php";
 
 try {
-    app_log("USER CHECK SESSION ID: " . session_id());
+    app_log("LOGOUT SESSION ID BEFORE: " . session_id());
 
-    if (!isset($_SESSION["user_id"])) {
-        json_success([
-            "user" => null
-        ]);
+    $_SESSION = [];
+
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+
+        setcookie(
+            session_name(),
+            "",
+            time() - 42000,
+            $params["path"],
+            $params["domain"],
+            $params["secure"],
+            $params["httponly"]
+        );
     }
 
-    $userId = (int)$_SESSION["user_id"];
-
-    $stmt = $pdo->prepare("
-        select email, name
-        from users
-        where id = ?
-        limit 1
-    ");
-    $stmt->execute([$userId]);
-    $user = $stmt->fetch();
-
-    if (!$user) {
-        unset($_SESSION["user_id"]);
-
-        json_success([
-            "user" => null
-        ]);
-    }
+    session_destroy();
 
     json_success([
-        "user" => [
-            "id" => $userId,
-            "email" => (string)$user["email"],
-            "name" => (string)$user["name"],
-        ]
+        "message" => "Sikeres kijelentkezés."
     ]);
 
 } catch (Throwable $e) {
-    app_log_exception("USER CHECK ERROR", $e);
-    json_error("Nem sikerült lekérni a felhasználót.", 500);
+    app_log_exception("LOGOUT ERROR", $e);
+    json_error("Nem sikerült kijelentkezni.", 500);
 }

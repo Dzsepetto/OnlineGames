@@ -61,7 +61,6 @@ try {
     ]);
 
 } catch (Throwable $e) {
-    error_log("QUIZ ATTEMPT ERROR: " . $e->getMessage());
     app_log_exception("QUIZ ATTEMPT ERROR: ", $e);
 
     json_error("Nem sikerült menteni az eredményt.", 500);

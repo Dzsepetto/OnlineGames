@@ -224,6 +224,7 @@ export async function getQuizMeta(slug: string) {
     title: q.title,
     description: q.description,
     creator_name: q.creator_name,
+    creator_nickname: q.creator_nickname,
     language: q.language_code ?? "hu",
     isPublic: toBool(q.is_public),
   };

@@ -48,18 +48,45 @@ try {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    if (!$user) {
-        $stmt = $pdo->prepare("
-            insert into users (email, name)
-            values (?, ?)
-        ");
-        $stmt->execute([$email, $name]);
+if (!$user) {
+    $baseNickname = explode("@", $email)[0];
+    $nickname = $baseNickname;
+    $i = 1;
 
-        $userId = (int)$pdo->lastInsertId();
-    } else {
-        $userId = (int)$user["id"];
+    while (true) {
+        $checkStmt = $pdo->prepare("
+            select id
+            from users
+            where nickname = ?
+            limit 1
+        ");
+        $checkStmt->execute([$nickname]);
+
+        if (!$checkStmt->fetch()) {
+            break;
+        }
+
+        $nickname = $baseNickname . $i;
+        $i++;
     }
 
+    $stmt = $pdo->prepare("
+        insert into users (email, name, nickname, description)
+        values (?, ?, ?, ?)
+    ");
+
+    $stmt->execute([
+        $email,
+        $name,
+        $nickname,
+        ""
+    ]);
+
+    $userId = (int)$pdo->lastInsertId();
+} else {
+    $userId = (int)$user["id"];
+}
+    session_regenerate_id(true);
     $_SESSION["user_id"] = $userId;
 
     app_log("GOOGLE LOGIN SESSION ID: " . session_id());

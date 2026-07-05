@@ -103,7 +103,7 @@
 }
 
 .tab-item.active {
-  background-color: blue;
+  background-color: #3b82f6;
   margin-top: 5px;
   margin-bottom: 5px;
 }
@@ -218,8 +218,8 @@
 }
 
 .btn-save {
-  background-color: blue; /* #bae6fd */
-  color: #0f172a; /* Sötét szöveg a jó kontrasztért */
+  background-color: #3b82f6;
+  color: whitesmoke;
   border: none;
   border-radius: 8px;
   padding: 12px 24px;

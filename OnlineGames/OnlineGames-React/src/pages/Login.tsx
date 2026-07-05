@@ -4,12 +4,16 @@ import { useAuth } from "../auth/AuthContext";
 import { API_BASE } from "../config/api";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import "../styles/login.css";
 
 export default function Login() {
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
   const { t } = useTranslation();
+
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   return (
     <div className="login-page">
@@ -30,11 +34,14 @@ export default function Login() {
               theme="filled_black"
               shape="pill"
               size="large"
-              width="100%" 
+              width="100%"
               onSuccess={async (cred) => {
+                setLoginError(null);
+                setIsLoggingIn(true);
+
                 try {
                   if (!cred.credential) {
-                    console.error("Missing Google credential");
+                    setLoginError("Hiányzik a Google azonosító token.");
                     return;
                   }
 
@@ -52,27 +59,46 @@ export default function Login() {
                   const data = await res.json();
 
                   if (!res.ok || !data?.success) {
-                    console.error("Google login failed:", data);
+                    setLoginError(
+                      data?.message || "Nem sikerült bejelentkezni Google-fiókkal."
+                    );
                     return;
                   }
 
                   const loggedInUser = await refreshUser();
 
                   if (!loggedInUser) {
-                    console.error("Login sikeres volt, de a user.php nem adott vissza usert.");
+                    setLoginError(
+                      "A bejelentkezés sikeres volt, de a felhasználói adatok betöltése nem sikerült."
+                    );
                     return;
                   }
 
                   navigate("/");
                 } catch (error) {
                   console.error("Google login error:", error);
+                  setLoginError("Váratlan hiba történt bejelentkezés közben.");
+                } finally {
+                  setIsLoggingIn(false);
                 }
               }}
               onError={() => {
-                console.error("Google login failed");
+                setLoginError("A Google bejelentkezés megszakadt vagy sikertelen volt.");
               }}
             />
           </div>
+
+          {loginError && (
+            <div className="login-error">
+              {loginError}
+            </div>
+          )}
+
+          {isLoggingIn && (
+            <div className="login-loading">
+              Bejelentkezés folyamatban...
+            </div>
+          )}
 
           <div className="login-terms">{t("login.terms")}</div>
         </div>

@@ -36,6 +36,7 @@ try {
         select
             u.id as user_id,
             u.name as user_name,
+            u.nickname as user_nickname,
             qa.score as score,
             qa.max_score as max_score,
             qa.created_at as created_at

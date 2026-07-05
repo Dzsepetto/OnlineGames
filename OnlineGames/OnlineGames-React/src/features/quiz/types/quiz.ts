@@ -32,12 +32,14 @@ export type QuizMeta = {
   title: string;
   description: string;
   creator_name?: string;
+  creator_nickname?:string;
   isPublic?: boolean;
 };
 
 export type QuizResultRow = {
   user_id: string;
   user_name: string;
+  user_nickname: string;
   score: number;
   max_score: number;
   created_at: string;
