@@ -31,3 +31,37 @@ export const getProfile = async (nickname?: string) => {
 
   return data.data;
 };
+
+export const followUser = async (userId: string | number) => {
+  const response = await fetch(`${API_BASE}/follow.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ user_id: userId }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.success !== true) {
+    throw new Error(data.message || "Nem sikerült bekövetni.");
+  }
+
+  return data.data;
+};
+
+export const unfollowUser = async (userId: string | number) => {
+  const response = await fetch(`${API_BASE}/unfollow.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ user_id: userId }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.success !== true) {
+    throw new Error(data.message || "Nem sikerült kikövetni.");
+  }
+
+  return data.data;
+};

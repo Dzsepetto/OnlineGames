@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE } from "../config/api";
 import { deleteQuiz } from "../features/quiz/services/quizService";
-import { getProfile } from "../features/user/userServices";
+import { getProfile, followUser, unfollowUser } from "../features/user/userServices";
 import QuizCard from "../features/quiz/components/QuizCard";
 import type { Quiz } from "../features/quiz/types/quiz";
 import "../styles/profilePage.css";
@@ -26,6 +26,7 @@ const ProfilePage = () => {
 
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [followLoading, setFollowLoading] = useState(false);
 
   const [myQuizzes, setMyQuizzes] = useState<Quiz[]>([]);
   const [isLoadingQuizzes, setIsLoadingQuizzes] = useState(false);
@@ -113,6 +114,32 @@ const ProfilePage = () => {
     alert("Profilkép szerkesztése ablak megnyitása...");
   };
 
+  const handleFollowToggle = async () => {
+  if (!profile?.id) return;
+  if (isOwnProfile) return;
+  if (followLoading) return;
+
+  setFollowLoading(true);
+
+  try {
+    if (isFollowing) {
+      await unfollowUser(profile.id);
+
+      setIsFollowing(false);
+      setFollowersCount((c) => Math.max(0, c - 1));
+    } else {
+      await followUser(profile.id);
+
+      setIsFollowing(true);
+      setFollowersCount((c) => c + 1);
+    }
+  } catch (e: any) {
+    alert(e?.message || "Nem sikerült módosítani a követést.");
+  } finally {
+    setFollowLoading(false);
+  }
+};
+
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -187,9 +214,17 @@ const ProfilePage = () => {
 
               {!isOwnProfile && (
                 <div className="profile-actions">
-                  <button className="btn-primary">
-                    {isFollowing ? "Following" : "Follow"}
-                  </button>
+                 <button
+                  className="btn-primary"
+                  onClick={handleFollowToggle}
+                  disabled={followLoading}
+                >
+                  {followLoading
+                    ? "..."
+                    : isFollowing
+                      ? "Following"
+                      : "Follow"}
+                </button>
                 </div>
               )}
             </div>
